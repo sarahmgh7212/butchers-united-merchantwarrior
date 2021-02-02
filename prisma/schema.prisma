@@ -11,22 +11,323 @@ generator client {
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
+// ----------- Users -----------
+
+model Invitation {
+  @@map(name: "users_invitations")
+  id                                 String             @id @default(dbgenerated())
+  first_opened                       DateTime?
+  active                             Boolean
+  expires_at                         DateTime
+
+  user_id                            String
+
+  createdAt                          DateTime           @default(now()) @map("created_at")
+  updatedAt                          DateTime           @default(now()) @map("udpated_at")
+  deletedAt                          DateTime?          @map("deleted_at")
+
+  user                               User               @relation(fields: [user_id], references: [id])
+}
+
+model User {
+  @@map(name: "users_users")
+  id                                 String             @id @default(dbgenerated())
+  name                               String
+  mobile_number                      String?            @unique
+  fcm_id                             String?
+  auth_provider_id                   String             @unique
+  email                              String             @unique
+  notification_settings              Json               @default("{\"sms\": true, \"web\": false, \"mobile\": false, \"welcome\": false, \"sysGenerated\": true}")
+  
+  createdAt                          DateTime           @default(now()) @map("created_at")
+  updatedAt                          DateTime           @default(now()) @map("udpated_at")
+  deletedAt                          DateTime?          @map("deleted_at")
+
+  invitation                         Invitation?
+  customer                           Customer?
+  passwordResets                     PasswordReset[]
+  businesses                         Business[]         @relation("businesses_businesses_users")
+}
+
+model PasswordReset {
+  id                                 String             @id @default(dbgenerated())
+  access_code                        String
+
+  user_id                            String
+
+  createdAt                          DateTime           @default(now()) @map("created_at")
+  updatedAt                          DateTime           @default(now()) @map("udpated_at")
+
+  user                               User               @relation(fields: [user_id], references: [id])
+}
+
+// ----------- Customers -----------
+
+enum CustomerableType {
+  USER
+  BUSINESS
+}
+
+model Customer {
+  @@map(name: "customers_customers")
+  id                                 String             @id @default(dbgenerated())
+  customerable_id                    String?
+  customerable_type                  CustomerableType
+  tags                               Json?
+
+  createdAt                          DateTime           @default(now()) @map("created_at")
+  updatedAt                          DateTime           @default(now()) @map("udpated_at")
+  deletedAt                          DateTime?          @map("deleted_at")
+
+  user                               User?              @relation(fields: [customerable_id], references: [id])
+  business                           Business?          @relation(fields: [customerable_id], references: [id])
+}
+
+// ----------- Businesses -----------
+
 model Business {
   @@map(name: "businesses_businesses")
-  uuid                                String         @id @default(dbgenerated())
+  id                                  String            @id @default(dbgenerated())
   name                                String
-  abn                                 String         @unique
+  abn                                 String            @unique
   logo_uri                            String?
-  // fd_location_uuid                    String?
-  createdAt                           DateTime      @default(now()) @map("created_at")
-  updatedAt                           DateTime      @default(now()) @map("udpated_at")
-  deletedAt                           DateTime?     @map("deleted_at")
+
+  // fd_location_id                      String?
+
+  createdAt                           DateTime          @default(now()) @map("created_at")
+  updatedAt                           DateTime          @default(now()) @map("udpated_at")
+  deletedAt                           DateTime?         @map("deleted_at")
 
   // email                              String?
   // phone                              String?
   // baiada_ship_to                     String?
   // mcos                               Float?
+
+  customer                            Customer?
+  users                               User[]            @relation("businesses_businesses_users")
 }
+
+// ----------- Products -----------
+
+model Product {
+  @@map(name: "products_products")
+
+  id                                  String   @id @default(dbgenerated())
+  name                                String
+  description                         String
+  external_reference                  String?
+  img_uri                             String
+  sell_ex                             Float
+  cost_ex                             Float
+  gst                                 Boolean  @default(false)
+  qty_available                       Int
+  qty_sold                            Int      @default(0)
+  promo_release_date                  DateTime
+  promo_expiry_date                   DateTime
+  available_date                      DateTime
+  buy_qty                             Float
+  buy_multiplier                      Int
+  tags                                Json
+  is_estimated_qty                    Boolean? @default(false)
+  // buy_units_uuid       String
+  // sell_units_uuid      String
+  // fd_supplier_uuid     String
+  // fd_manufacturer_uuid String?
+
+  is_sellable                         Boolean? @default(true)
+  is_global                           Boolean? @default(false)
+  parent_uuid                         String?
+  parent_blob                         Json?
+  media                               Json?
+
+  createdAt                           DateTime         @default(now()) @map("created_at")
+  updatedAt                           DateTime         @default(now()) @map("udpated_at")
+  deletedAt                           DateTime?        @map("deleted_at")
+
+  collections                         Collection[]        @relation("products_collections_products")
+  variants                            Variant[]
+}
+
+model Variant {
+  @@map(name: "products_variant")
+
+  id                                  String         @id @default(dbgenerated())
+
+  product_id                          String
+  
+  createdAt                           DateTime       @default(now()) @map("created_at")
+  updatedAt                           DateTime       @default(now()) @map("udpated_at")
+  deletedAt                           DateTime?      @map("deleted_at")
+
+  product                             Product        @relation(fields: [product_id], references: [id])
+  availabilityRules                   AvailabilityRule[]
+}
+
+model AvailabilityRule {
+  @@map(name: "products_availability_rule")
+
+  id                                  String         @id @default(dbgenerated())
+
+  variant_id                          String
+  
+  createdAt                           DateTime @default(now()) @map("created_at")
+  updatedAt                           DateTime @default(now()) @map("udpated_at")
+  deletedAt                           DateTime? @map("deleted_at")
+
+  variant                             Variant        @relation(fields: [variant_id], references: [id])
+}
+
+model Discount {
+  @@map(name: "products_discount")
+
+  id                                  String         @id @default(dbgenerated())
+  
+  createdAt                           DateTime @default(now()) @map("created_at")
+  updatedAt                           DateTime @default(now()) @map("udpated_at")
+  deletedAt                           DateTime? @map("deleted_at")
+}
+
+model ProductUnit {
+  @@map(name: "products_units")
+  id                                  String   @id @default(dbgenerated())
+  singular                            String
+  abbreviation                        String
+
+  createdAt                           DateTime @default(now()) @map("created_at")
+  updatedAt                           DateTime @default(now()) @map("udpated_at")
+  deletedAt                           DateTime? @map("deleted_at")
+}
+
+model Collection {
+  @@map(name: "products_collections")
+  id                                  String          @id @default(dbgenerated())
+  name                                String
+  description                         String
+  img_uri                             String
+  logo_uri                            String
+  tags                                Json?
+
+  createdAt                           DateTime?      @default(now()) @map("created_at")
+  updatedAt                           DateTime?      @default(now()) @map("udpated_at")
+  deletedAt                           DateTime?      @map("deleted_at")
+
+  products                            Product[]      @relation("products_collections_products")
+}
+
+// ----------- Orders -----------
+
+model OrderItem {
+  @@map(name: "orders_order_items")
+  id                                  String         @id @default(dbgenerated())
+  qty_order                           Int
+  qty_received                        Int
+  sell_ex                             Float
+  sell_gst                            Float
+  is_estimate                         Boolean
+  product_blob                        Json?
+
+  order_id                            String
+  fd_variant_id                       String
+
+  createdAt                          DateTime      @default(now()) @map("created_at")
+  updatedAt                          DateTime      @default(now()) @map("udpated_at")
+  deletedAt                          DateTime?     @map("deleted_at")
+
+  order                              Order         @relation(fields: [order_id], references: [id])
+  variant                            Variant       @relation(fields: [fd_variant_id], references: [id])
+}
+
+model Order {
+  @@map(name: "orders_orders")
+  
+  id                              String        @id @default(dbgenerated())
+  order_ref                       Int         @default(autoincrement())
+  // status                          Int           @default(0)
+  // fd_delivery_location_uuid       String
+  fd_customer_id                  String
+  fd_business_id                  String
+  fd_user_id                      String
+
+  createdAt                       DateTime      @default(now()) @map("created_at")
+  updatedAt                       DateTime      @default(now()) @map("udpated_at")
+  deletedAt                       DateTime?     @map("deleted_at")
+
+  business                        Business      @relation(fields: [fd_business_id], references: [id])
+  customer                        Customer      @relation(fields: [fd_customer_id], references: [id])
+  user                            User          @relation(fields: [fd_user_id], references: [id])
+}
+
+model Cart {
+  @@map(name: "orders_carts")
+  id                              String   @id @default(dbgenerated())
+  data                            Json
+
+  fd_customer_id                  String
+  fd_user_id                      String
+
+  customer                        Customer      @relation(fields: [fd_customer_id], references: [id])
+  user                            User          @relation(fields: [fd_user_id], references: [id])
+}
+
+model Invoice {
+  @@map(name: "orders_invoices")
+  id                              String        @id @default(dbgenerated())
+  invoice_ref                     Int           @default(autoincrement())
+
+  order_id                        String
+  
+  createdAt                       DateTime      @default(now()) @map("created_at")
+  updatedAt                       DateTime      @default(now()) @map("udpated_at")
+  deletedAt                       DateTime?     @map("deleted_at")
+
+  order                           Order         @relation(fields: [order_id], references: [id])
+}
+
+// ----------- Payments -----------
+
+model PaymentMethod {
+  @@map(name: "payments_payment_methods")
+  id                              String        @id @default(dbgenerated())
+  provider_type                   String
+  provider_id                     String
+  // last_four                       String?
+  // expiry_month                    String?
+  // expiry_year                     String?
+  // fd_customer_uuid                String
+  data                            Json?
+
+  createdAt                       DateTime       @default(now()) @map("created_at")
+  updatedAt                       DateTime       @default(now()) @map("udpated_at")
+  deletedAt                       DateTime?      @map("deleted_at")
+}
+
+model Payment {
+  @@map(name: "payments_payments")
+  id                              String         @id @default(dbgenerated())
+  // payment_method_uuid             String
+  // fd_order_uuid                   String
+  // payment_status                  String?        @default("pending")
+  receipt_number                  Int?           @default(autoincrement())
+  notes                           String?
+  amount                          Float?
+  // transaction_type                String?        @default("charge")
+
+  createdAt                       DateTime       @default(now()) @map("created_at")
+  updatedAt                       DateTime       @default(now()) @map("udpated_at")
+  deletedAt                       DateTime?      @map("deleted_at")
+}
+
+// ----------- Places -----------
+
+model Place {
+  @@map(name: "products_variant")
+  id                              String         @id @default(dbgenerated())
+  
+  createdAt                       DateTime @default(now()) @map("created_at")
+  updatedAt                       DateTime @default(now()) @map("udpated_at")
+  deletedAt                       DateTime? @map("deleted_at")
+}
+
 
 // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
 // model businesses_businesses_users {
@@ -39,16 +340,6 @@ model Business {
   // permissions   Json     @default("{\"role\": \"user\", \"permissions\": {\"edit_all\": false, \"read_all\": true, \"create_all\": false, \"delete_all\": false}}")
 // }
 
-model Customer {
-  @@map(name: "customers_customers")
-  uuid                               String        @id @default(dbgenerated())
-  customerable_uuid                  String
-  customerable_type                  String
-  tags                               Json?
-  createdAt                          DateTime      @default(now()) @map("created_at")
-  updatedAt                          DateTime      @default(now()) @map("udpated_at")
-  deletedAt                          DateTime?     @map("deleted_at")
-}
 
 // model Place {
 
@@ -58,7 +349,7 @@ model Customer {
 // model locations_locations {
   // @@map(name: "locations_locations")
   /// The value of this field is generated by the database as: `uuid_generate_v1()`.
-  // uuid             String   @id @default(dbgenerated())
+  // id              String   @id @default(dbgenerated())
   // address_line1    String
   // address_line2    String
   // address_city     String
@@ -75,7 +366,7 @@ model Customer {
 // model notifications_dispatch {
   // @@map(name: "notifications_dispatch")
   /// The value of this field is generated by the database as: `uuid_generate_v1()`.
-  // uuid              String?   @id @default(dbgenerated())
+  // id               String?   @id @default(dbgenerated())
   // notification_type Int?
   // notification_time DateTime?
   // username          String?
@@ -86,151 +377,22 @@ model Customer {
   // push_message      String?
 // }
 
-// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
-model OrderItem {
-  @@map(name: "orders_order_items")
-  uuid                            String        @id @default(dbgenerated())
-  order_uuid                      String
-  // fd_product_uuid                 String
-  qty_order                       Int
-  qty_received                    Int
-  cost_ex                         Float
-  gst                             Boolean
-  sell_ex                         Float
-  is_estimate                     Boolean
-  buy_qty                         Float?
-  product_blob                    Json?
-
-  createdAt                       DateTime      @default(now()) @map("created_at")
-  updatedAt                       DateTime      @default(now()) @map("udpated_at")
-  deletedAt                       DateTime?     @map("deleted_at")
-}
-
-// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
-model Order {
-  @@map(name: "orders_orders")
-  order_id                        Int           @default(autoincrement())
-  uuid                            String        @id @default(dbgenerated())
-  status                          Int           @default(0)
-  // fd_delivery_location_uuid       String
-  // fd_customer_uuid                String
-  // fd_supplier_uuid                String
-  // fd_user_uuid                    String
-
-  createdAt                       DateTime      @default(now()) @map("created_at")
-  updatedAt                       DateTime      @default(now()) @map("udpated_at")
-  deletedAt                       DateTime?     @map("deleted_at")
-}
-
-model PaymentMethod {
-  @@map(name: "payments_payment_methods")
-  uuid                            String        @id @default(dbgenerated())
-  provider_type                   String
-  provider_id                     String
-  // last_four                       String?
-  // expiry_month                    String?
-  // expiry_year                     String?
-  // fd_customer_uuid                String
-  data                            Json?
-  createdAt                       DateTime       @default(now()) @map("created_at")
-  updatedAt                       DateTime       @default(now()) @map("udpated_at")
-  deletedAt                       DateTime?      @map("deleted_at")
-}
-
-model Payment {
-  @@map(name: "payments_payments")
-  uuid                            String         @id @default(dbgenerated())
-  // payment_method_uuid             String
-  // fd_order_uuid                   String
-  // payment_status                  String?        @default("pending")
-  receipt_number                  Int?           @default(autoincrement())
-  notes                           String?
-  amount                          Float?
-  // transaction_type                String?        @default("charge")
-
-  createdAt                       DateTime       @default(now()) @map("created_at")
-  updatedAt                       DateTime       @default(now()) @map("udpated_at")
-  deletedAt                       DateTime?      @map("deleted_at")
-}
-
-model Collection {
-  @@map(name: "products_collections")
-  /// The value of this field is generated by the database as: `uuid_generate_v1()`.
-  uuid                            String          @id @default(dbgenerated())
-  name                            String
-  description                     String
-  img_uri                         String
-  logo_uri                        String
-  tags                            Json?
-  createdAt                       DateTime?      @default(now()) @map("created_at")
-  updatedAt                       DateTime?      @default(now()) @map("udpated_at")
-  deletedAt                       DateTime?      @map("deleted_at")
-}
-
 // model products_collections_products {
 //   @@map(name: "products_collections_products")
 //   /// The value of this field is generated by the database as: `uuid_generate_v1()`.
-//   uuid            String    @id @default(dbgenerated())
+//   id             String    @id @default(dbgenerated())
 //   collection_uuid String
 //   product_uuid    String
 //   createdAt      DateTime? @default(now()) @map("created_at")
 //   updatedAt      DateTime? @default(now()) @map("udpated_at")
 // }
 
-model Product {
-  @@map(name: "products_products")
-
-  uuid                 String   @id @default(dbgenerated())
-  name                 String
-  description          String
-  external_reference   String?
-  img_uri              String
-  sell_ex              Float
-  cost_ex              Float
-  gst                  Boolean  @default(false)
-  qty_available        Int
-  qty_sold             Int      @default(0)
-  promo_release_date   DateTime
-  promo_expiry_date    DateTime
-  available_date       DateTime
-  buy_qty              Float
-  buy_multiplier       Int
-  tags                 Json
-  is_estimated_qty     Boolean? @default(false)
-  // buy_units_uuid       String
-  // sell_units_uuid      String
-  // fd_supplier_uuid     String
-  // fd_manufacturer_uuid String?
-
-  is_sellable          Boolean? @default(true)
-  is_global            Boolean? @default(false)
-  parent_uuid          String?
-  parent_blob          Json?
-  media                Json?
-
-  createdAt            DateTime @default(now()) @map("created_at")
-  updatedAt            DateTime @default(now()) @map("udpated_at")
-  deletedAt            DateTime? @map("deleted_at")
-}
-
-
-model ProductUnit {
-  @@map(name: "products_units")
-
-  uuid                  String   @id @default(dbgenerated())
-  singular              String
-  abbreviation          String
-
-  createdAt             DateTime @default(now()) @map("created_at")
-  updatedAt             DateTime @default(now()) @map("udpated_at")
-  deletedAt             DateTime? @map("deleted_at")
-}
 
 // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
 // model products_promos {
   // @@map(name: "products_promos")
   /// The value of this field is generated by the database as: `uuid_generate_v1()`.
-  // uuid         String   @id @default(dbgenerated())
+  // id          String   @id @default(dbgenerated())
   // type         String
   // product_uuid String
   // data         Json?
@@ -240,22 +402,10 @@ model ProductUnit {
 
 
 // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
-// model shorty_short_url {
-  // @@map(name: "shorty_short_url")
-  // uuid         String
-  // product_uuid String?
-  // fd_user_uuid String
-  // first_opened DateTime?
-  // times_opened Int?
-  // createdAt   DateTime  @default(now()) @map("created_at")
-  // updatedAt   DateTime  @default(now()) @map("udpated_at")
-// }
-
-// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
 // model users_events {
   // @@map(name: "users_events")
   /// The value of this field is generated by the database as: `uuid_generate_v1()`.
-  // uuid       String   @id @default(dbgenerated())
+  // id        String   @id @default(dbgenerated())
   // event      String
   // data       Json?
   // user_uuid  String?
@@ -264,34 +414,7 @@ model ProductUnit {
 // }
 
 // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
-model Invitation {
-  @@map(name: "users_invitations")
-  uuid                    String    @id @default(dbgenerated())
-  first_opened            DateTime?
-  active                  Boolean
-  // user_uuid               String
-  expires_at              DateTime
-  createdAt               DateTime  @default(now()) @map("created_at")
-  updatedAt               DateTime  @default(now()) @map("udpated_at")
-  deletedAt               DateTime? @map("deleted_at")
-}
 
-model User {
-  @@map(name: "users_users")
-  uuid                    String   @id @default(dbgenerated())
-  name                    String?
-  mobile_number           String?  @unique
-  fcm_id                  String?
-  auth_provider_id        String?  @unique
-  email                   String?
-  region                  String?
-  permissions             Json?
-  notification_settings   Json     @default("{\"sms\": true, \"web\": false, \"mobile\": false, \"welcome\": false, \"sysGenerated\": true}")
-  createdAt               DateTime @default(now()) @map("created_at")
-  updatedAt               DateTime @default(now()) @map("udpated_at")
-  deletedAt               DateTime? @map("deleted_at")
-  // access_code             String?
-}
 
 // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
 // model users_users_locations {
