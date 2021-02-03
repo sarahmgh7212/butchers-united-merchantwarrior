@@ -30,8 +30,8 @@ export class UsersModelController extends ResourceController<
   UpdateUserDto,
   UsersModelService
 > {
-  constructor(private readonly productsModelService: UsersModelService) {
-    super(productsModelService);
+  constructor(private readonly usersModelService: UsersModelService) {
+    super(usersModelService);
   }
 
   @ApiQuery({
