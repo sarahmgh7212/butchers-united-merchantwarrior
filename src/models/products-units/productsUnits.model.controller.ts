@@ -23,7 +23,7 @@ import { UpdateProductsUnitsDto } from './dto/update-products-units.dto';
 import { ProductsUnitsModelService } from './productsUnits.model.service';
 
 @ApiTags('ProductsUnitss')
-@Controller('users')
+@Controller('product-units')
 export class ProductsUnitsModelController extends ResourceController<
   ProductUnit,
   CreateProductsUnitsDto,
@@ -72,7 +72,7 @@ export class ProductsUnitsModelController extends ResourceController<
 
   @ApiOkResponse({ type: ReturnProductsUnitsDto })
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<ProductsUnits> {
+  delete(@Param('id') id: string): Promise<ProductUnit> {
     return super.delete(id);
   }
 }

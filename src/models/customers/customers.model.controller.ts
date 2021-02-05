@@ -18,7 +18,7 @@ import { Customer } from '@prisma/client';
 import { ResourceController } from 'src/libs/resources/resource.controller';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { FilterCustomersDto } from './dto/filter-cutomers.dto';
-import { ReturnCustomerDto } from './dto/return-customer.dto';
+import { CustomerDto } from './dto/customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CustomersModelService } from './customers.model.service';
 
@@ -45,19 +45,19 @@ export class CustomersModelController extends ResourceController<
     return super.findMany(query);
   }
 
-  @ApiOkResponse({ type: ReturnCustomerDto })
+  @ApiOkResponse({ type: CustomerDto })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Customer> {
     return super.findUnique(id);
   }
 
-  @ApiCreatedResponse({ type: ReturnCustomerDto })
+  @ApiCreatedResponse({ type: CustomerDto })
   @Post()
   create(@Body() createCustomerDto: CreateCustomerDto): Promise<Customer> {
     return super.create(createCustomerDto);
   }
 
-  @ApiOkResponse({ type: ReturnCustomerDto })
+  @ApiOkResponse({ type: CustomerDto })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -66,7 +66,7 @@ export class CustomersModelController extends ResourceController<
     return super.update(id, updateCustomerDto);
   }
 
-  @ApiOkResponse({ type: ReturnCustomerDto })
+  @ApiOkResponse({ type: CustomerDto })
   @Delete(':id')
   delete(@Param('id') id: string): Promise<Customer> {
     return super.delete(id);

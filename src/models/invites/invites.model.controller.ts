@@ -18,8 +18,8 @@ import { Invite } from '@prisma/client';
 import { ResourceController } from 'src/libs/resources/resource.controller';
 import { CreateInviteDto } from './dto/create-invite.dto';
 import { FilterInvitesDto } from './dto/filter-invites.dto';
-import { ReturnInviteDto } from './dto/return-invitation.dto';
-import { UpdateInviteDto } from './dto/update-invitation.dto';
+import { InviteDto } from './dto/invite.dto';
+import { UpdateInviteDto } from './dto/update-invite.dto';
 import { InvitesModelService } from './invites.model.service';
 
 @ApiTags('Invites')
@@ -39,25 +39,25 @@ export class InvitesModelController extends ResourceController<
     required: false,
     type: FilterInvitesDto,
   })
-  @ApiOkResponse({ type: [CreateInviteDto] })
+  @ApiOkResponse({ type: [InviteDto] })
   @Get()
   findMany(@Query() query: FilterInvitesDto): Promise<Invite[]> {
     return super.findMany(query);
   }
 
-  @ApiOkResponse({ type: ReturnInviteDto })
+  @ApiOkResponse({ type: InviteDto })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Invite> {
     return super.findUnique(id);
   }
 
-  @ApiCreatedResponse({ type: ReturnInviteDto })
+  @ApiCreatedResponse({ type: InviteDto })
   @Post()
   create(@Body() createInviteDto: CreateInviteDto): Promise<Invite> {
     return super.create(createInviteDto);
   }
 
-  @ApiOkResponse({ type: ReturnInviteDto })
+  @ApiOkResponse({ type: InviteDto })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -66,7 +66,7 @@ export class InvitesModelController extends ResourceController<
     return super.update(id, updateInviteDto);
   }
 
-  @ApiOkResponse({ type: ReturnInviteDto })
+  @ApiOkResponse({ type: InviteDto })
   @Delete(':id')
   delete(@Param('id') id: string): Promise<Invite> {
     return super.delete(id);

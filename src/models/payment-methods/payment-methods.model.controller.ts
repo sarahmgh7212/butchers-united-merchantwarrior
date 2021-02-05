@@ -16,17 +16,18 @@ import {
 } from '@nestjs/swagger';
 import { PaymentMethod } from '@prisma/client';
 import { ResourceController } from 'src/libs/resources/resource.controller';
-import { CreatePaymentMethodsDto } from './dto/create-payment-methods.dto';
+import { CreatePaymentMethodDto } from './dto/create-payment-method.dto';
 import { FilterPaymentMethodsDto } from './dto/filter-payment-methods.dto';
 import { ReturnPaymentMethodsDto } from './dto/return-payment-methods.dto';
+
 import { UpdatePaymentMethodsDto } from './dto/update-payment-methods.dto';
 import { PaymentMethodsModelService } from './payment-methods.model.service';
 
 @ApiTags('PaymentMethods')
 @Controller('payment-methods')
 export class PaymentMethodsModelController extends ResourceController<
-  PaymentMethod,
-  CreatePaymentMethodsDto,
+  ReturnPaymentMethodsDto,
+  CreatePaymentMethodDto,
   UpdatePaymentMethodsDto,
   PaymentMethodsModelService
 > {
@@ -41,7 +42,7 @@ export class PaymentMethodsModelController extends ResourceController<
     required: false,
     type: FilterPaymentMethodsDto,
   })
-  @ApiOkResponse({ type: [CreatePaymentMethodsDto] })
+  @ApiOkResponse({ type: [CreatePaymentMethodDto] })
   @Get()
   findMany(@Query() query: FilterPaymentMethodsDto): Promise<PaymentMethod[]> {
     return super.findMany(query);
@@ -56,9 +57,9 @@ export class PaymentMethodsModelController extends ResourceController<
   @ApiCreatedResponse({ type: ReturnPaymentMethodsDto })
   @Post()
   create(
-    @Body() createPaymentMethodDto: CreatePaymentMethodsDto,
+    @Body() createPaymentMethodDto: CreatePaymentMethodDto,
   ): Promise<PaymentMethod> {
-    return super.create(CreatePaymentMethodsDto);
+    return super.create(CreatePaymentMethodDto);
   }
 
   @ApiOkResponse({ type: ReturnPaymentMethodsDto })

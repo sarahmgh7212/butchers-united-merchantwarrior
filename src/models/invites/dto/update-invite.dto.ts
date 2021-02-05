@@ -1,6 +1,11 @@
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateInviteDto } from './create-invite.dto';
 import { IsEmail, IsIn, IsOptional, IsUUID } from 'class-validator';
 
-export class CreateInviteDto {
+export class UpdateInviteDto extends PartialType(CreateInviteDto) {
+  @IsUUID()
+  id: string;
+
   @IsOptional()
   @IsIn(['ACTIVE', 'USED', 'CANCELLED'])
   status?: 'ACTIVE' | 'USED' | 'CANCELLED';

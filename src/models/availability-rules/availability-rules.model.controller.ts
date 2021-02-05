@@ -18,7 +18,7 @@ import { AvailabilityRule } from '@prisma/client';
 import { ResourceController } from '../../libs/resources/resource.controller';
 import { CreateAvailabilityRulesDto } from './dto/create-availability-rules.dto';
 import { FilterAvailabilityRulesDto } from './dto/filter-availability-rules.dto';
-import { ReturnAvailabilityRulesDto } from './dto/return-availability-rules.dto';
+import { AvailabilityRulesDto } from './dto/availability-rules.dto';
 import { UpdateAvailabilityRulesDto } from './dto/update-availability-rules.dto';
 import { AvailabilityRulesModelService } from './availability-rules.model.service';
 
@@ -49,13 +49,13 @@ export class AvailabilityRulesModelController extends ResourceController<
     return super.findMany(query);
   }
 
-  @ApiOkResponse({ type: ReturnAvailabilityRulesDto })
+  @ApiOkResponse({ type: AvailabilityRulesDto })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<AvailabilityRule> {
     return super.findUnique(id);
   }
 
-  @ApiCreatedResponse({ type: ReturnAvailabilityRulesDto })
+  @ApiCreatedResponse({ type: AvailabilityRulesDto })
   @Post()
   create(
     @Body() createAvailabilityRulesDto: CreateAvailabilityRulesDto,
@@ -63,7 +63,7 @@ export class AvailabilityRulesModelController extends ResourceController<
     return super.create(createAvailabilityRulesDto);
   }
 
-  @ApiOkResponse({ type: ReturnAvailabilityRulesDto })
+  @ApiOkResponse({ type: AvailabilityRulesDto })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -72,7 +72,7 @@ export class AvailabilityRulesModelController extends ResourceController<
     return super.update(id, updateAvailabilityRulesDto);
   }
 
-  @ApiOkResponse({ type: ReturnAvailabilityRulesDto })
+  @ApiOkResponse({ type: AvailabilityRulesDto })
   @Delete(':id')
   delete(@Param('id') id: string): Promise<AvailabilityRule> {
     return super.delete(id);

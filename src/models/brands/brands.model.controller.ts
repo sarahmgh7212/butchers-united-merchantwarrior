@@ -18,7 +18,7 @@ import { Brand } from '@prisma/client';
 import { ResourceController } from '../../libs/resources/resource.controller';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { FilterBrandsDto } from './dto/filter-brands.dto';
-import { ReturnBrandDto } from './dto/return-brand.dto';
+import { BrandDto } from './dto/brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import { BrandsModelService } from './brands.model.service';
 
@@ -45,19 +45,19 @@ export class BrandsModelController extends ResourceController<
     return super.findMany(query);
   }
 
-  @ApiOkResponse({ type: ReturnBrandDto })
+  @ApiOkResponse({ type: BrandDto })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Brand> {
     return super.findUnique(id);
   }
 
-  @ApiCreatedResponse({ type: ReturnBrandDto })
+  @ApiCreatedResponse({ type: BrandDto })
   @Post()
   create(@Body() createBrandDto: CreateBrandDto): Promise<Brand> {
     return super.create(createBrandDto);
   }
 
-  @ApiOkResponse({ type: ReturnBrandDto })
+  @ApiOkResponse({ type: BrandDto })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -66,7 +66,7 @@ export class BrandsModelController extends ResourceController<
     return super.update(id, updateBrandDto);
   }
 
-  @ApiOkResponse({ type: ReturnBrandDto })
+  @ApiOkResponse({ type: BrandDto })
   @Delete(':id')
   delete(@Param('id') id: string): Promise<Brand> {
     return super.delete(id);

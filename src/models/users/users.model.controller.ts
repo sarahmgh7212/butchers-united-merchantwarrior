@@ -16,11 +16,11 @@ import {
 } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { ResourceController } from 'src/libs/resources/resource.controller';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserDto } from './dto/user.dto';
 import { FilterUsersDto } from './dto/filter-users.dto';
-import { ReturnUserDto } from './dto/return-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersModelService } from './users.model.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -39,25 +39,25 @@ export class UsersModelController extends ResourceController<
     required: false,
     type: FilterUsersDto,
   })
-  @ApiOkResponse({ type: [CreateUserDto] })
+  @ApiOkResponse({ type: [UserDto] })
   @Get()
   findMany(@Query() query: FilterUsersDto): Promise<User[]> {
     return super.findMany(query);
   }
 
-  @ApiOkResponse({ type: ReturnUserDto })
+  @ApiOkResponse({ type: UserDto })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User> {
     return super.findUnique(id);
   }
 
-  @ApiCreatedResponse({ type: ReturnUserDto })
+  @ApiCreatedResponse({ type: UserDto })
   @Post()
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return super.create(createUserDto);
   }
 
-  @ApiOkResponse({ type: ReturnUserDto })
+  @ApiOkResponse({ type: UserDto })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -66,7 +66,7 @@ export class UsersModelController extends ResourceController<
     return super.update(id, updateUserDto);
   }
 
-  @ApiOkResponse({ type: ReturnUserDto })
+  @ApiOkResponse({ type: UserDto })
   @Delete(':id')
   delete(@Param('id') id: string): Promise<User> {
     return super.delete(id);

@@ -1,4 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
+import { DiscountStatus } from '@prisma/client';
+import { IsIn, IsUUID } from 'class-validator';
 import { CreateDiscountDto } from './create-discount.dto';
 
-export class UpdateDiscountDto extends PartialType(CreateDiscountDto) {}
+export class UpdateDiscountDto extends PartialType(CreateDiscountDto) {
+  @IsUUID()
+  id: string;
+
+  @IsIn(Object.values(DiscountStatus))
+  status: DiscountStatus;
+}

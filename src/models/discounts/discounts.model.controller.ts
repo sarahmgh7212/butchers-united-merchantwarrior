@@ -18,7 +18,7 @@ import { Discount } from '@prisma/client';
 import { ResourceController } from '../../libs/resources/resource.controller';
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { FilterDiscountsDto } from './dto/filter-discounts.dto';
-import { ReturnDiscountDto } from './dto/return-discount.dto';
+import { DiscountDto } from './dto/discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { DiscountsModelService } from './discounts.model.service';
 
@@ -45,19 +45,19 @@ export class DiscountsModelController extends ResourceController<
     return super.findMany(query);
   }
 
-  @ApiOkResponse({ type: ReturnDiscountDto })
+  @ApiOkResponse({ type: DiscountDto })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Discount> {
     return super.findUnique(id);
   }
 
-  @ApiCreatedResponse({ type: ReturnDiscountDto })
+  @ApiCreatedResponse({ type: DiscountDto })
   @Post()
   create(@Body() createDiscountDto: CreateDiscountDto): Promise<Discount> {
     return super.create(createDiscountDto);
   }
 
-  @ApiOkResponse({ type: ReturnDiscountDto })
+  @ApiOkResponse({ type: DiscountDto })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -66,7 +66,7 @@ export class DiscountsModelController extends ResourceController<
     return super.update(id, updateDiscountDto);
   }
 
-  @ApiOkResponse({ type: ReturnDiscountDto })
+  @ApiOkResponse({ type: DiscountDto })
   @Delete(':id')
   delete(@Param('id') id: string): Promise<Discount> {
     return super.delete(id);

@@ -18,12 +18,12 @@ import { Media } from '@prisma/client';
 import { ResourceController } from '../../libs/resources/resource.controller';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { FilterMediaDto } from './dto/filter-media.dto';
-import { ReturnMediaDto } from './dto/return-media.dto';
+import { MediaDto } from './dto/media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
 import { MediaModelService } from './media.model.service';
 
 @ApiTags('Media')
-@Controller('users')
+@Controller('media')
 export class MediaModelController extends ResourceController<
   Media,
   CreateMediaDto,
@@ -45,19 +45,19 @@ export class MediaModelController extends ResourceController<
     return super.findMany(query);
   }
 
-  @ApiOkResponse({ type: ReturnMediaDto })
+  @ApiOkResponse({ type: MediaDto })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Media> {
     return super.findUnique(id);
   }
 
-  @ApiCreatedResponse({ type: ReturnMediaDto })
+  @ApiCreatedResponse({ type: MediaDto })
   @Post()
   create(@Body() createMediaDto: CreateMediaDto): Promise<Media> {
     return super.create(createMediaDto);
   }
 
-  @ApiOkResponse({ type: ReturnMediaDto })
+  @ApiOkResponse({ type: MediaDto })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -66,7 +66,7 @@ export class MediaModelController extends ResourceController<
     return super.update(id, updateMediaDto);
   }
 
-  @ApiOkResponse({ type: ReturnMediaDto })
+  @ApiOkResponse({ type: MediaDto })
   @Delete(':id')
   delete(@Param('id') id: string): Promise<Media> {
     return super.delete(id);

@@ -20,9 +20,8 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { FilterPaymentsDto } from './dto/filter-payments.dto';
 
-
 import { PaymentsModelService } from './payments.model.service';
-import { ReturnPaymentDto } from './dto/return-payment.dto';
+import { PaymentDto } from './dto/payment.dto';
 
 @ApiTags('Payments')
 @Controller('payments')
@@ -47,19 +46,19 @@ export class PaymentsModelController extends ResourceController<
     return super.findMany(query);
   }
 
-  @ApiOkResponse({ type: ReturnPaymentDto })
+  @ApiOkResponse({ type: PaymentDto })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Payment> {
     return super.findUnique(id);
   }
 
-  @ApiCreatedResponse({ type: ReturnPaymentDto })
+  @ApiCreatedResponse({ type: PaymentDto })
   @Post()
   create(@Body() createPaymentDto: CreatePaymentDto): Promise<Payment> {
     return super.create(createPaymentDto);
   }
 
-  @ApiOkResponse({ type: ReturnPaymentDto })
+  @ApiOkResponse({ type: PaymentDto })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -68,7 +67,7 @@ export class PaymentsModelController extends ResourceController<
     return super.update(id, updatePaymentDto);
   }
 
-  @ApiOkResponse({ type: ReturnPaymentDto })
+  @ApiOkResponse({ type: PaymentDto })
   @Delete(':id')
   delete(@Param('id') id: string): Promise<Payment> {
     return super.delete(id);

@@ -18,7 +18,7 @@ import { Collection } from '@prisma/client';
 import { ResourceController } from '../../libs/resources/resource.controller';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { FilterCollectionsDto } from './dto/filter-collections.dto';
-import { ReturnCollectionDto } from './dto/return-collection.dto';
+import { CollectionDto } from './dto/collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
 import { CollectionsModelService } from './collections.model.service';
 
@@ -45,13 +45,13 @@ export class CollectionsModelController extends ResourceController<
     return super.findMany(query);
   }
 
-  @ApiOkResponse({ type: ReturnCollectionDto })
+  @ApiOkResponse({ type: CollectionDto })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Collection> {
     return super.findUnique(id);
   }
 
-  @ApiCreatedResponse({ type: ReturnCollectionDto })
+  @ApiCreatedResponse({ type: CollectionDto })
   @Post()
   create(
     @Body() createCollectionDto: CreateCollectionDto,
@@ -59,7 +59,7 @@ export class CollectionsModelController extends ResourceController<
     return super.create(createCollectionDto);
   }
 
-  @ApiOkResponse({ type: ReturnCollectionDto })
+  @ApiOkResponse({ type: CollectionDto })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -68,7 +68,7 @@ export class CollectionsModelController extends ResourceController<
     return super.update(id, updateCollectionDto);
   }
 
-  @ApiOkResponse({ type: ReturnCollectionDto })
+  @ApiOkResponse({ type: CollectionDto })
   @Delete(':id')
   delete(@Param('id') id: string): Promise<Collection> {
     return super.delete(id);

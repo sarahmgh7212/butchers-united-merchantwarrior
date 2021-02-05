@@ -13,20 +13,36 @@ generator client {
 
 // ----------- Users -----------
 
+enum InviteStatus {
+  ACTIVE
+  USED
+  CANCELLED
+}
+
 model Invite {
   @@map(name: "users_invites")
   id                                 String             @id @default(dbgenerated())
-  first_opened                       DateTime?
-  active                             Boolean
+  first_opened_at                    DateTime?
+  status                             InviteStatus   @default(ACTIVE)
   expires_at                         DateTime
+  email                              String
 
-  user_id                            String
+  inviter_id                         String
+  business_id                        String
+  user_id                            String?
 
   createdAt                          DateTime           @default(now()) @map("created_at")
   updatedAt                          DateTime           @default(now()) @map("udpated_at")
   deletedAt                          DateTime?          @map("deleted_at")
 
-  user                               User               @relation(fields: [user_id], references: [id])
+  inviter                            User               @relation(name: "InvitesCreated",fields: [inviter_id], references: [id])
+  business                           Business           @relation(fields: [business_id], references: [id])
+  user                               User?              @relation(name: "Invites",fields: [user_id], references: [id])
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
 }
 
 model User {
@@ -34,31 +50,46 @@ model User {
   id                                 String             @id @default(dbgenerated())
   name                               String
   mobile_number                      String?            @unique
-  fcm_id                             String?
+  notifications_provider_id          String?
   auth_provider_id                   String             @unique
   email                              String             @unique
   notification_settings              Json               @default("{\"sms\": true, \"web\": false, \"mobile\": false, \"welcome\": false, \"sysGenerated\": true}")
+  status                             UserStatus         @default(ACTIVE)
+  email_verified_at                  DateTime?
+  tags                               Json?
+  notes                              String?
   
   createdAt                          DateTime           @default(now()) @map("created_at")
   updatedAt                          DateTime           @default(now()) @map("udpated_at")
   deletedAt                          DateTime?          @map("deleted_at")
 
-  invite                             Invite?
+  invitesCreated                     Invite[]           @relation("InvitesCreated")
+  invites                            Invite[]           @relation("Invites")
   customer                           Customer?
   passwordResets                     PasswordReset[]
   businesses                         Business[]         @relation("businesses_businesses_users")
+  ordersPlaced                       Order[]            @relation("OrdersPlaced")
+}
+
+enum PasswordResetStatus {
+  ACTIVE
+  USED
+  CANCELLED
 }
 
 model PasswordReset {
-  id                                 String             @id @default(dbgenerated())
+  @@map(name: "users_password_resets")
+  id                                 String               @id @default(dbgenerated())
   access_code                        String
+  status                             PasswordResetStatus  @default(ACTIVE)
+  expires_at                         DateTime
 
   user_id                            String
 
-  createdAt                          DateTime           @default(now()) @map("created_at")
-  updatedAt                          DateTime           @default(now()) @map("udpated_at")
+  createdAt                          DateTime             @default(now()) @map("created_at")
+  updatedAt                          DateTime             @default(now()) @map("udpated_at")
 
-  user                               User               @relation(fields: [user_id], references: [id])
+  user                               User                 @relation(fields: [user_id], references: [id])
 }
 
 // ----------- Customers -----------
@@ -85,12 +116,20 @@ model Customer {
 
 // ----------- Businesses -----------
 
+enum BusinessStatus {
+  ACTIVE
+  DISABLED
+}
+
 model Business {
   @@map(name: "businesses_businesses")
   id                                  String            @id @default(dbgenerated())
   name                                String
   abn                                 String            @unique
   logo_uri                            String?
+  status                              BusinessStatus    @default(ACTIVE)
+  contact_email                       String?
+  contact_phone                       String?
 
   // fd_location_id                      String?
 
@@ -98,16 +137,24 @@ model Business {
   updatedAt                           DateTime          @default(now()) @map("udpated_at")
   deletedAt                           DateTime?         @map("deleted_at")
 
-  // email                              String?
-  // phone                              String?
+
   // baiada_ship_to                     String?
   // mcos                               Float?
 
   customer                            Customer?
   users                               User[]            @relation("businesses_businesses_users")
+  suppliedProducts                    Product[]         @relation("SuppliedProducts")
+  manufacturedProducts                Product[]         @relation("ManufacturedProducts")
+  suppliedOrders                      Order[]           @relation("SuppliedOrders")
+  ownBrands                           Brand[]           @relation("OwnBrands")                              
 }
 
 // ----------- Products -----------
+
+enum ProductStatus {
+  ACTIVE
+  DISABLED
+}
 
 model Product {
   @@map(name: "products_products")
@@ -116,57 +163,89 @@ model Product {
   name                                String
   description                         String
   external_reference                  String?
-  img_uri                             String
-  sell_ex                             Float
-  cost_ex                             Float
-  gst                                 Boolean  @default(false)
-  qty_available                       Int
-  qty_sold                            Int      @default(0)
-  promo_release_date                  DateTime
-  promo_expiry_date                   DateTime
-  available_date                      DateTime
-  buy_qty                             Float
-  buy_multiplier                      Int
-  tags                                Json
-  is_estimated_qty                    Boolean? @default(false)
-  // buy_units_uuid       String
-  // sell_units_uuid      String
-  // fd_supplier_uuid     String
-  // fd_manufacturer_uuid String?
+  status                              ProductStatus @default(ACTIVE)
 
-  is_sellable                         Boolean? @default(true)
-  is_global                           Boolean? @default(false)
-  parent_uuid                         String?
-  parent_blob                         Json?
-  media                               Json?
+  order_units_id                      String
+  invoice_units_id                    String
+
+  is_estimated_qty                    Boolean? @default(false)
+  fd_supplier_id                      String
+  fd_manufacturer_id                  String?
+  brand_id                            String?
+  tags                                Json?
 
   createdAt                           DateTime         @default(now()) @map("created_at")
   updatedAt                           DateTime         @default(now()) @map("udpated_at")
   deletedAt                           DateTime?        @map("deleted_at")
 
-  collections                         Collection[]        @relation("products_collections_products")
+  collections                         Collection[]     @relation("products_collections_products")
+  media                               Media[]          @relation("products_media_products")
   variants                            Variant[]
+  brand                               Brand?           @relation(fields: [brand_id], references: [id])
+  supplier                            Business         @relation(name: "SuppliedProducts", fields: [fd_supplier_id], references: [id])
+  manufacturer                        Business?        @relation(name: "ManufactureredProducts", fields: [fd_manufacturer_id], references: [id])
+  orderUnit                           ProductUnit     @relation(name: "OrderedProducts", fields: [order_units_id], references: [id])
+  invoiceUnit                         ProductUnit     @relation(name: "InvoicedProducts", fields: [invoice_units_id], references: [id])
+}
+
+enum VariantStatus {
+  ACTIVE
+  DISABLED
 }
 
 model Variant {
   @@map(name: "products_variant")
 
   id                                  String         @id @default(dbgenerated())
+  status                              VariantStatus  @default(ACTIVE)
+  description                         String
+  sellEx                              Float  @map("sell_ex")
+  sellGst                             Float  @map("sell_gst")
+  costEx                              Float  @map("cost_ex")
+  costGst                             Float  @map("cost_gst")
+  qtyAvailable                        Int  @map("qty_available")
+  qtySold                             Int      @default(0)  @map("qty_sold")
+  availableDate                       DateTime  @map("available_date")
+  invoiceToOrderRatio                 Float      @map("invoice_to_order_ratio")     
+  stepQty                             Int  @map("step_qty")
+  minimumQty                          Float  @map("minimum_qty")
+
+  // Do units belong here
 
   product_id                          String
+  discount_id                         String
   
   createdAt                           DateTime       @default(now()) @map("created_at")
   updatedAt                           DateTime       @default(now()) @map("udpated_at")
   deletedAt                           DateTime?      @map("deleted_at")
 
   product                             Product        @relation(fields: [product_id], references: [id])
+  discount                            Discount       @relation(fields: [discount_id], references: [id])
   availabilityRules                   AvailabilityRule[]
+}
+
+enum AvailabilityRulesStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum RuleType {
+  REGIONS
+  CUSTOMER_TYPE
+  CUSTOMER_IDS
+  TAGS
 }
 
 model AvailabilityRule {
   @@map(name: "products_availability_rule")
 
   id                                  String         @id @default(dbgenerated())
+  status                              AvailabilityRulesStatus @default(ACTIVE)
+  type                                RuleType
+  regionIds                           String[]      @map("region_ids")
+  customerType                        String?       @map("customer_type")
+  customerIds                         String[]       @map("customer_ids")
+  tags                                String[]
 
   variant_id                          String
   
@@ -177,14 +256,77 @@ model AvailabilityRule {
   variant                             Variant        @relation(fields: [variant_id], references: [id])
 }
 
+enum DiscountStatus {
+  ACTIVE
+  DISABLED
+}
+
 model Discount {
   @@map(name: "products_discount")
-
   id                                  String         @id @default(dbgenerated())
-  
+  name                                String
+  status                              DiscountStatus  @default(ACTIVE)
+  startAt                             DateTime?   @map("start_at")        
+  endAt                               DateTime?   @map("end_at")
+
   createdAt                           DateTime @default(now()) @map("created_at")
   updatedAt                           DateTime @default(now()) @map("udpated_at")
   deletedAt                           DateTime? @map("deleted_at")
+
+  variants                            Variant[]
+  discountValues                      DiscountValue[]
+}
+
+enum DiscountValueType {
+  AMOUNT
+  PERCENTAGE
+}
+
+model DiscountValue {
+  @@map(name: "products_discount_value")
+  id                                  String         @id @default(dbgenerated())
+  type                                DiscountValueType
+  gtQty                               Float          @default(0)
+  ltQty                               Float          @default(10000000000000000)
+  gteTo                               Boolean        @default(false)
+  lteTo                               Boolean        @default(false)
+  value                               Float
+
+  discount_id                         String
+
+  createdAt                           DateTime @default(now()) @map("created_at")
+  updatedAt                           DateTime @default(now()) @map("udpated_at")
+  deletedAt                           DateTime? @map("deleted_at")
+
+  discount                            Discount      @relation(fields: [discount_id], references: [id])
+}
+
+enum BrandStatus {
+  ACTIVE
+  DISABLED
+}
+
+model Brand {
+  @@map(name: "products_brands")
+
+  id                                  String       @id @default(dbgenerated())
+  status                              BrandStatus  @default(ACTIVE)
+  name                                String
+  logo_id                             String
+  supplier_id                         String?
+
+  createdAt                           DateTime    @default(now()) @map("created_at")
+  updatedAt                           DateTime    @default(now()) @map("udpated_at")
+  deletedAt                           DateTime?   @map("deleted_at")
+
+  supplier                            Business?   @relation(name: "OwnBrands", fields: [supplier_id], references: [id])
+  logo                                Media       @relation(name: "BrandsUsingLogo", fields: [logo_id], references: [id])
+  products                            Product[]
+}
+
+enum ProductUnitStatus {
+  ACTIVE
+  DISABLED
 }
 
 model ProductUnit {
@@ -192,10 +334,19 @@ model ProductUnit {
   id                                  String   @id @default(dbgenerated())
   singular                            String
   abbreviation                        String
+  status                              ProductUnitStatus  @default(ACTIVE)
 
   createdAt                           DateTime @default(now()) @map("created_at")
   updatedAt                           DateTime @default(now()) @map("udpated_at")
   deletedAt                           DateTime? @map("deleted_at")
+  
+  purchasedProducts                   Product[] @relation("PurchasedProducts")
+  invoicedProducts                    Product[] @relation("InvoicedProducts")
+}
+
+enum CollectionStatus {
+  ACTIVE
+  DISABLED
 }
 
 model Collection {
@@ -203,15 +354,45 @@ model Collection {
   id                                  String          @id @default(dbgenerated())
   name                                String
   description                         String
-  img_uri                             String
-  logo_uri                            String
+  status                              CollectionStatus  @default(ACTIVE)
   tags                                Json?
+  logo_id                             String
 
   createdAt                           DateTime?      @default(now()) @map("created_at")
   updatedAt                           DateTime?      @default(now()) @map("udpated_at")
   deletedAt                           DateTime?      @map("deleted_at")
 
+  logo                                Media          @relation(name: "CollectionsUsingLogo", fields: [logo_id], references: [id])
+  media                               Media[]        @relation("products_collections_media")
   products                            Product[]      @relation("products_collections_products")
+}
+
+enum MediaStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model Media {
+  @@map(name: "products_media")
+  id                                  String          @id @default(dbgenerated())
+  status                              MediaStatus     @default(ACTIVE)
+  label                               String
+  type                                MediaType       
+  business_id                         String
+  
+  createdAt                           DateTime        @default(now()) @map("created_at")
+  updatedAt                           DateTime        @default(now()) @map("udpated_at")
+  deletedAt                           DateTime?       @map("deleted_at")
+
+  products                            Product[]
+  collections                         Collection[]    @relation("products_collections_media")
+  brandsUsingLogo                     Brand[]         @relation("BrandsUsingLogo")                     
+  collectionsUsingLogo                Collection[]    @relation("CollectionsUsingLogo")
 }
 
 // ----------- Orders -----------
@@ -219,8 +400,8 @@ model Collection {
 model OrderItem {
   @@map(name: "orders_order_items")
   id                                  String         @id @default(dbgenerated())
-  qty_order                           Int
-  qty_received                        Int
+  qty_ordered                         Int
+  qty_received                        Int?
   sell_ex                             Float
   sell_gst                            Float
   is_estimate                         Boolean
@@ -242,19 +423,24 @@ model Order {
   
   id                              String        @id @default(dbgenerated())
   order_ref                       Int         @default(autoincrement())
-  // status                          Int           @default(0)
+  completedAt                     DateTime?     @map("completed_at")
+  shippedAt                       DateTime?     @map("shipped_at")
+  packedAt                        DateTime?     @map("packed_at")
+  processedAt                     DateTime?     @map("processed_at")
+  paidAt                          DateTime?     @map("paid_at")
+
   // fd_delivery_location_uuid       String
   fd_customer_id                  String
-  fd_business_id                  String
-  fd_user_id                      String
+  fd_supplier_id                  String
+  fd_orderer_id                   String
 
   createdAt                       DateTime      @default(now()) @map("created_at")
   updatedAt                       DateTime      @default(now()) @map("udpated_at")
   deletedAt                       DateTime?     @map("deleted_at")
 
-  business                        Business      @relation(fields: [fd_business_id], references: [id])
+  supplier                        Business      @relation(name: "SuppliedOrders", fields: [fd_supplier_id], references: [id])
   customer                        Customer      @relation(fields: [fd_customer_id], references: [id])
-  user                            User          @relation(fields: [fd_user_id], references: [id])
+  orderer                         User          @relation(name: "OrdersPlaced", fields: [fd_orderer_id], references: [id])
 }
 
 model Cart {
@@ -272,7 +458,8 @@ model Cart {
 model Invoice {
   @@map(name: "orders_invoices")
   id                              String        @id @default(dbgenerated())
-  invoice_ref                     Int           @default(autoincrement())
+  invoiceRef                     Int           @default(autoincrement()) @map("invoice_ref")
+  generatedFileUrl                String        @map("generated_file_url")
 
   order_id                        String
   
@@ -285,11 +472,24 @@ model Invoice {
 
 // ----------- Payments -----------
 
+enum PaymentMethodStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum PaymentMethodType {
+  CARD
+  DIRECT_DEBIT
+  ROLLING_ACCOUNT
+  SUPPLIER_ACCOUNT
+}
+
 model PaymentMethod {
   @@map(name: "payments_payment_methods")
   id                              String        @id @default(dbgenerated())
   provider_type                   String
   provider_id                     String
+  status                          PaymentMethodStatus @default(ACTIVE)
   // last_four                       String?
   // expiry_month                    String?
   // expiry_year                     String?
