@@ -23,15 +23,15 @@ import { UpdateInviteDto } from './dto/update-invite.dto';
 import { InvitesModelService } from './invites.model.service';
 
 @ApiTags('Invites')
-@Controller('invitations')
+@Controller('invites')
 export class InvitesModelController extends ResourceController<
   Invite,
   CreateInviteDto,
   UpdateInviteDto,
   InvitesModelService
 > {
-  constructor(private readonly invitationsModelService: InvitesModelService) {
-    super(invitationsModelService);
+  constructor(private readonly invitesModelService: InvitesModelService) {
+    super(invitesModelService);
   }
 
   @ApiQuery({

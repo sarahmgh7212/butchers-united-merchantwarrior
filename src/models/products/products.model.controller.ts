@@ -18,7 +18,7 @@ import { Product } from '@prisma/client';
 import { ResourceController } from 'src/libs/resources/resource.controller';
 import { CreateProductDto } from './dto/create-product.dto';
 import { FilterProductsDto } from './dto/filter-products.dto';
-import { ReturnProductDto } from './dto/return-product.dto';
+import { ProductDto } from './dto/product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsModelService } from './products.model.service';
 
@@ -45,19 +45,19 @@ export class ProductsModelController extends ResourceController<
     return super.findMany(query);
   }
 
-  @ApiOkResponse({ type: ReturnProductDto })
+  @ApiOkResponse({ type: ProductDto })
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Product> {
     return super.findUnique(id);
   }
 
-  @ApiCreatedResponse({ type: ReturnProductDto })
+  @ApiCreatedResponse({ type: ProductDto })
   @Post()
   create(@Body() createProductDto: CreateProductDto): Promise<Product> {
     return super.create(createProductDto);
   }
 
-  @ApiOkResponse({ type: ReturnProductDto })
+  @ApiOkResponse({ type: ProductDto })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -66,7 +66,7 @@ export class ProductsModelController extends ResourceController<
     return super.update(id, updateProductDto);
   }
 
-  @ApiOkResponse({ type: ReturnProductDto })
+  @ApiOkResponse({ type: ProductDto })
   @Delete(':id')
   delete(@Param('id') id: string): Promise<Product> {
     return super.delete(id);

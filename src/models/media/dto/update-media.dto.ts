@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { MediaStatus } from '@prisma/client';
+import { MediaStatus, MediaType } from '@prisma/client';
 import { IsIn, IsOptional, IsString, IsUUID } from 'class-validator';
 import { CreateMediaDto } from './create-media.dto';
 
@@ -8,10 +8,17 @@ export class UpdateMediaDto extends PartialType(CreateMediaDto) {
   id: string;
 
   @IsIn(Object.values(MediaStatus))
-  @IsOptional()
   status: MediaStatus;
 
   @IsString()
-  @IsOptional()
+  label: string;
+
+  @IsIn(Object.values(MediaType))
+  type: MediaType;
+
+  @IsString()
   business_id: string;
+
+  @IsString()
+  productId: string | null;
 }

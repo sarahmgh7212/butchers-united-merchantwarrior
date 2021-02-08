@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateInviteDto } from './create-invite.dto';
-import { IsEmail, IsIn, IsOptional, IsUUID } from 'class-validator';
+import { IsDate, IsEmail, IsIn, IsOptional, IsUUID } from 'class-validator';
 
 export class UpdateInviteDto extends PartialType(CreateInviteDto) {
   @IsUUID()
@@ -15,6 +15,9 @@ export class UpdateInviteDto extends PartialType(CreateInviteDto) {
 
   @IsUUID()
   inviter_id: string;
+
+  @IsDate()
+  expires_at: Date;
 
   @IsUUID()
   business_id: string;

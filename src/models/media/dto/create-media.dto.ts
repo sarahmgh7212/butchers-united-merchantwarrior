@@ -1,14 +1,18 @@
-import { MediaStatus } from '@prisma/client';
+import { MediaStatus, MediaType } from '@prisma/client';
 import { IsIn, IsOptional, IsString, IsUUID } from 'class-validator';
 export class CreateMediaDto {
-  @IsUUID()
-  id: string;
-
   @IsIn(Object.values(MediaStatus))
-  @IsOptional()
   status: MediaStatus;
 
   @IsString()
-  @IsOptional()
+  label: string;
+
+  @IsIn(Object.values(MediaType))
+  type: MediaType;
+
+  @IsString()
   business_id: string;
+
+  @IsString()
+  productId: string | null;
 }

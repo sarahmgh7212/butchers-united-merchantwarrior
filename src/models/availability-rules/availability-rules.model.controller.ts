@@ -22,7 +22,7 @@ import { AvailabilityRulesDto } from './dto/availability-rules.dto';
 import { UpdateAvailabilityRulesDto } from './dto/update-availability-rules.dto';
 import { AvailabilityRulesModelService } from './availability-rules.model.service';
 
-@ApiTags('AvailabilityRuless')
+@ApiTags('AvailabilityRules')
 @Controller('availability-rules')
 export class AvailabilityRulesModelController extends ResourceController<
   AvailabilityRule,

@@ -20,6 +20,10 @@ export class CreateCollectionDto {
 
   @IsOptional()
   @IsString()
+  logo_id: string;
+
+  @IsOptional()
+  @IsString()
   logo_uri: string;
 
   @IsOptional()

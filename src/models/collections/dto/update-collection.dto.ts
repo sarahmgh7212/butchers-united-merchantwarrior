@@ -26,6 +26,10 @@ export class UpdateCollectionDto extends PartialType(CreateCollectionDto) {
 
   @IsOptional()
   @IsString()
+  logo_id: string;
+
+  @IsOptional()
+  @IsString()
   logo_uri: string;
 
   @IsOptional()
