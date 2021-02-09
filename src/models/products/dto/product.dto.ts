@@ -13,31 +13,31 @@ export class ProductDto implements Product {
   description: string;
 
   @Expose({ groups: [] })
-  external_reference: string | null;
+  externalReference: string | null;
 
   @Expose({ groups: [] })
   status: ProductStatus;
 
   @Expose({ groups: [] })
-  order_units_id: string;
-
-  @Expose({ groups: [] })
-  invoice_units_id: string;
-
-  @Expose({ groups: [] })
-  is_estimated_qty: boolean | null;
-
-  @Expose({ groups: [] })
-  fd_supplier_id: string;
-
-  @Expose({ groups: [] })
-  fd_manufacturer_id: string | null;
-
-  @Expose({ groups: [] })
-  brand_id: string | null;
+  isEstimatedQty: boolean | null;
 
   @Expose({ groups: [] })
   tags: GenericObject | null;
+
+  @Expose({ groups: [] })
+  orderUnitsId: string;
+
+  @Expose({ groups: [] })
+  invoiceUnitsId: string;
+
+  @Expose({ groups: [] })
+  fdSupplierId: string;
+
+  @Expose({ groups: [] })
+  fdManufacturerId: string | null;
+
+  @Expose({ groups: [] })
+  brandId: string | null;
 
   @Expose({ groups: [] })
   createdAt: Date;

@@ -10,7 +10,7 @@ import {
 
 export class CreateOrderDto {
   @IsNumber()
-  order_ref: number;
+  orderRef: number;
 
   @IsDate()
   completedAt: Date | null;
@@ -28,11 +28,14 @@ export class CreateOrderDto {
   paidAt: Date | null;
 
   @IsString()
-  fd_customer_id: string;
+  fdDeliveryLocationId: string;
 
   @IsString()
-  fd_supplier_id: string;
+  fdCustomerId: string;
 
   @IsString()
-  fd_orderer_id: string;
+  fdSupplierId: string;
+
+  @IsString()
+  fdOrdererId: string;
 }

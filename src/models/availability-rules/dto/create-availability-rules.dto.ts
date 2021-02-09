@@ -6,10 +6,11 @@ export class CreateAvailabilityRulesDto {
   @IsIn(Object.values(AvailabilityRulesStatus))
   status: AvailabilityRulesStatus;
 
-  @IsString()
-  variant_id: string;
   @IsIn(Object.values(RuleType))
   type: RuleType;
+
+  @IsString()
+  variantId: string;
 
   @IsString()
   regionIds: string[];

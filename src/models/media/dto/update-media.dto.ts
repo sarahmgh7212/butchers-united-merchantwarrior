@@ -17,7 +17,7 @@ export class UpdateMediaDto extends PartialType(CreateMediaDto) {
   type: MediaType;
 
   @IsString()
-  business_id: string;
+  businessId: string;
 
   @IsString()
   productId: string | null;

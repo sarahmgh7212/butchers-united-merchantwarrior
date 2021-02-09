@@ -13,7 +13,7 @@ export class UpdateOrderDto extends PartialType(CreateOrderDto) {
   id: string;
 
   @IsNumber()
-  order_ref: number;
+  orderRef: number;
 
   @IsDate()
   completedAt: Date | null;
@@ -36,13 +36,17 @@ export class UpdateOrderDto extends PartialType(CreateOrderDto) {
 
   @IsString()
   @IsOptional()
-  fd_customer_id: string;
+  fdDeliveryLocationId: string;
 
   @IsString()
   @IsOptional()
-  fd_supplier_id: string;
+  fdCustomerId: string;
 
   @IsString()
   @IsOptional()
-  fd_orderer_id: string;
+  fdSupplierId: string;
+
+  @IsString()
+  @IsOptional()
+  fdOrdererId: string;
 }

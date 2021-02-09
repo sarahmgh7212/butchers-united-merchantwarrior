@@ -9,8 +9,8 @@ export class CreateBrandDto {
   name: string;
 
   @IsString()
-  logo_id: string;
+  logoId: string;
 
   @IsString()
-  supplier_id: string | null;
+  supplierId: string | null;
 }

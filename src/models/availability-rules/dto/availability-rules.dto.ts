@@ -4,6 +4,7 @@ import {
   RuleType,
 } from '@prisma/client';
 import { Expose } from 'class-transformer';
+import { IsString } from 'class-validator';
 
 export class AvailabilityRulesDto implements AvailabilityRule {
   @Expose({ groups: [] })
@@ -18,6 +19,9 @@ export class AvailabilityRulesDto implements AvailabilityRule {
   @Expose({ groups: [] })
   regionIds: string[];
 
+  @IsString()
+  variantId: string;
+
   @Expose({ groups: [] })
   customerType: string | null;
 
@@ -26,9 +30,6 @@ export class AvailabilityRulesDto implements AvailabilityRule {
 
   @Expose({ groups: [] })
   tags: string[];
-
-  @Expose({ groups: [] })
-  variant_id: string;
 
   @Expose({ groups: [] })
   createdAt: Date;

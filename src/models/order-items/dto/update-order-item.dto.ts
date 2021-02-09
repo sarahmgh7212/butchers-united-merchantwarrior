@@ -3,43 +3,47 @@ import { PartialType } from '@nestjs/swagger';
 import { CreateOrderItemDto } from './create-order-item.dto';
 import {
   IsBoolean,
+  IsDecimal,
   IsJSON,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
 import { GenericObject } from 'src/types';
+import { Decimal } from '@prisma/client/runtime';
 
 export class UpdateOrderItemDto extends PartialType(CreateOrderItemDto) {
   id: string;
 
-  @IsNumber()
   @IsOptional()
-  qty_ordered: number;
-
   @IsNumber()
-  @IsOptional()
-  qty_received: number | null;
+  qtyOrdered: number;
 
+  @IsOptional()
   @IsNumber()
-  @IsOptional()
-  sell_ex: number;
+  qtyReceived: number | null;
 
-  @IsNumber()
   @IsOptional()
-  sell_gst: number;
+  @IsDecimal()
+  sellEx: Decimal;
 
+  @IsOptional()
+  @IsDecimal()
+  sellGst: Decimal;
+
+  @IsOptional()
   @IsBoolean()
-  @IsOptional()
-  is_estimate: boolean;
+  isestimate: boolean;
 
+  @IsOptional()
   @IsJSON()
+  productBlob: GenericObject | null;
+
   @IsOptional()
-  product_blob: GenericObject | null;
-
   @IsString()
-  order_id: string;
+  orderId: string;
 
+  @IsOptional()
   @IsString()
-  fd_variant_id: string;
+  fdVariantId: string;
 }

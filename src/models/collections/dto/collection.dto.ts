@@ -16,16 +16,10 @@ export class CollectionDto implements Collection {
   status: CollectionStatus;
 
   @Expose({ groups: [] })
-  img_uri: string;
+  tags: GenericObject | null;
 
   @Expose({ groups: [] })
-  logo_id: string;
-
-  @Expose({ groups: [] })
-  logo_uri: string;
-
-  @Expose({ groups: [] })
-  tags: GenericObject;
+  logoId: string;
 
   @Expose({ groups: [] })
   createdAt: Date | null;

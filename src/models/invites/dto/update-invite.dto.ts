@@ -1,28 +1,29 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateInviteDto } from './create-invite.dto';
 import { IsDate, IsEmail, IsIn, IsOptional, IsUUID } from 'class-validator';
+import { InviteStatus } from '@prisma/client';
 
 export class UpdateInviteDto extends PartialType(CreateInviteDto) {
   @IsUUID()
   id: string;
 
   @IsOptional()
-  @IsIn(['ACTIVE', 'USED', 'CANCELLED'])
-  status?: 'ACTIVE' | 'USED' | 'CANCELLED';
+  @IsIn(Object.values(InviteStatus))
+  status: InviteStatus;
 
   @IsEmail()
   email: string;
 
   @IsUUID()
-  inviter_id: string;
+  inviterId: string;
 
   @IsDate()
-  expires_at: Date;
+  expiresAt: Date;
 
   @IsUUID()
-  business_id: string;
+  businessId: string;
 
   @IsOptional()
   @IsUUID()
-  user_id?: string;
+  userId?: string;
 }

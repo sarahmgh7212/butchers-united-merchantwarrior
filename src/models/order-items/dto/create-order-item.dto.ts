@@ -1,28 +1,35 @@
-import { IsBoolean, IsJSON, IsNumber, IsString } from 'class-validator';
+import { Decimal } from '@prisma/client/runtime';
+import {
+  IsBoolean,
+  IsDecimal,
+  IsJSON,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { GenericObject } from 'src/types';
 
 export class CreateOrderItemDto {
   @IsNumber()
-  qty_ordered: number;
+  qtyOrdered: number;
 
   @IsNumber()
-  qty_received: number | null;
+  qtyReceived: number | null;
 
-  @IsNumber()
-  sell_ex: number;
+  @IsDecimal()
+  sellEx: Decimal;
 
-  @IsNumber()
-  sell_gst: number;
+  @IsDecimal()
+  sellGst: Decimal;
 
   @IsBoolean()
-  is_estimate: boolean;
+  isestimate: boolean;
 
   @IsJSON()
-  product_blob: GenericObject | null;
+  productBlob: GenericObject | null;
 
   @IsString()
-  order_id: string;
+  orderId: string;
 
   @IsString()
-  fd_variant_id: string;
+  fdVariantId: string;
 }

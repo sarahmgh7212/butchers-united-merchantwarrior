@@ -7,7 +7,7 @@ export class OrderDto implements Order {
   id: string;
 
   @Expose({ groups: [] })
-  order_ref: number;
+  orderRef: number;
 
   @Expose({ groups: [] })
   completedAt: Date | null;
@@ -25,13 +25,16 @@ export class OrderDto implements Order {
   paidAt: Date | null;
 
   @Expose({ groups: [] })
-  fd_customer_id: string;
+  fdDeliveryLocationId: string;
 
   @Expose({ groups: [] })
-  fd_supplier_id: string;
+  fdCustomerId: string;
 
   @Expose({ groups: [] })
-  fd_orderer_id: string;
+  fdSupplierId: string;
+
+  @Expose({ groups: [] })
+  fdOrdererId: string;
 
   @Expose({ groups: [] })
   createdAt: Date;

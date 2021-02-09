@@ -15,7 +15,7 @@ export class MediaDto implements Media {
   type: MediaType;
 
   @Expose({ groups: [] })
-  business_id: string;
+  businessId: string;
 
   @Expose({ groups: [] })
   createdAt: Date;

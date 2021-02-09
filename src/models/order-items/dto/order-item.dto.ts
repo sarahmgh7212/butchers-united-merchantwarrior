@@ -1,4 +1,5 @@
 import { OrderItem } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime';
 import { Expose } from 'class-transformer';
 import { GenericObject } from 'src/types';
 
@@ -7,28 +8,28 @@ export class OrderItemDto implements OrderItem {
   id: string;
 
   @Expose({ groups: [] })
-  qty_ordered: number;
+  qtyOrdered: number;
 
   @Expose({ groups: [] })
-  qty_received: number | null;
+  qtyReceived: number | null;
 
   @Expose({ groups: [] })
-  sell_ex: number;
+  sellEx: Decimal;
 
   @Expose({ groups: [] })
-  sell_gst: number;
+  sellGst: Decimal;
 
   @Expose({ groups: [] })
-  is_estimate: boolean;
+  isEstimate: boolean;
 
   @Expose({ groups: [] })
-  product_blob: GenericObject | null;
+  productBlob: GenericObject | null;
 
   @Expose({ groups: [] })
-  order_id: string;
+  orderId: string;
 
   @Expose({ groups: [] })
-  fd_variant_id: string;
+  fdVariantId: string;
 
   @Expose({ groups: [] })
   createdAt: Date;

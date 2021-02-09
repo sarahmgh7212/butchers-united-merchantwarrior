@@ -10,25 +10,25 @@ export class UserDto implements User {
   name: string;
 
   @Expose({ groups: [] })
-  mobile_number: string | null;
+  mobileNumber: string | null;
 
   @Expose({ groups: [] })
-  notifications_provider_id: string | null;
+  notificationsProviderId: string | null;
 
   @Expose({ groups: [] })
-  auth_provider_id: string;
+  authProviderId: string;
 
   @Expose({ groups: [] })
   email: string;
 
   @Expose({ groups: [] })
-  notification_settings: GenericObject;
+  notificationSettings: GenericObject;
 
   @Expose({ groups: [] })
   status: UserStatus;
 
   @Expose({ groups: [] })
-  email_verified_at: Date | null;
+  emailVerifiedAt: Date | null;
 
   @Expose({ groups: [] })
   tags: GenericObject | null;

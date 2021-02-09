@@ -15,7 +15,7 @@ export class UpdateAvailabilityRulesDto extends PartialType(
 
   @IsString()
   @IsOptional()
-  variant_id: string;
+  variantId: string;
 
   @IsIn(Object.values(RuleType))
   type: RuleType;

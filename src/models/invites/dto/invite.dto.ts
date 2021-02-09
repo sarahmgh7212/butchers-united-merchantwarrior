@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Invite } from '@prisma/client';
+import { Invite, InviteStatus } from '@prisma/client';
 import { Expose } from 'class-transformer';
 
 export class InviteDto implements Invite {
@@ -7,25 +7,28 @@ export class InviteDto implements Invite {
   id: string;
 
   @Expose({ groups: [] })
-  first_opened_at: Date | null;
+  firstOpenedAt: Date | null;
 
   @Expose({ groups: [] })
-  status: 'ACTIVE' | 'USED' | 'CANCELLED';
+  status: InviteStatus;
 
   @Expose({ groups: [] })
-  expires_at: Date;
+  expiresAt: Date;
 
   @Expose({ groups: [] })
   email: string;
 
   @Expose({ groups: [] })
-  inviter_id: string;
+  consumedAt: Date | null;
 
   @Expose({ groups: [] })
-  business_id: string;
+  inviterId: string;
 
   @Expose({ groups: [] })
-  user_id: string | null;
+  businessId: string;
+
+  @Expose({ groups: [] })
+  userId: string | null;
 
   @Expose({ groups: [] })
   createdAt: Date;

@@ -1,6 +1,7 @@
 import { PartialType } from '@nestjs/swagger';
 import { UserStatus } from '@prisma/client';
 import {
+  IsDate,
   IsEmail,
   IsIn,
   IsJSON,
@@ -15,38 +16,33 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsUUID()
   id: string;
 
-  @IsOptional()
   @IsString()
   name: string;
 
-  @IsOptional()
   @IsString()
-  mobile_number: string | null;
+  mobileNumber: string | null;
 
   @IsString()
-  @IsOptional()
-  notifications_provider_id: string | null;
+  notificationsProviderId: string | null;
 
   @IsString()
-  @IsOptional()
-  auth_provider_id: string;
-  @IsOptional()
-  @IsEmail()
+  authProviderId: string;
+
+  @IsString()
   email: string;
 
   @IsJSON()
-  @IsOptional()
-  notification_settings: GenericObject;
+  notificationSettings: GenericObject;
 
-  @IsOptional()
   @IsIn(Object.values(UserStatus))
   status: UserStatus;
 
-  @IsOptional()
+  @IsDate()
+  emailVerifiedAt: Date | null;
+
   @IsJSON()
   tags: GenericObject | null;
 
-  @IsOptional()
   @IsString()
   notes: string | null;
 }

@@ -4,10 +4,10 @@ import { GenericObject } from 'src/types';
 
 export class CreateCustomerDto {
   @IsString()
-  customerable_id: string | null;
+  customerableId: string | null;
 
   @IsIn(Object.values(CustomerableType))
-  customerable_type: CustomerableType;
+  customerableType: CustomerableType;
 
   @IsJSON()
   tags: GenericObject | null;

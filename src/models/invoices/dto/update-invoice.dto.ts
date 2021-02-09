@@ -14,5 +14,5 @@ export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {
   generatedFileUrl: string;
 
   @IsString()
-  order_id: string;
+  orderId: string;
 }

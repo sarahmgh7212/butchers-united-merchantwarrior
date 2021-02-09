@@ -9,7 +9,10 @@ export class BrandDto implements Brand {
   name: string;
 
   @Expose({ groups: [] })
-  logo_id: string;
+  logoId: string;
+
+  @Expose({ groups: [] })
+  supplierId: string | null;
 
   @Expose({ groups: [] })
   supplier_id: string | null;

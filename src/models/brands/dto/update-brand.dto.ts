@@ -1,9 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { BrandStatus } from '@prisma/client';
-import { IsIn, IsString } from 'class-validator';
+import { IsIn, IsString, IsUUID } from 'class-validator';
 import { CreateBrandDto } from './create-brand.dto';
 
 export class UpdateBrandDto extends PartialType(CreateBrandDto) {
+  @IsUUID()
+  id: string;
+
   @IsIn(Object.values(BrandStatus))
   status: BrandStatus;
 
@@ -11,8 +14,8 @@ export class UpdateBrandDto extends PartialType(CreateBrandDto) {
   name: string;
 
   @IsString()
-  logo_id: string;
+  logoId: string;
 
   @IsString()
-  supplier_id: string | null;
+  supplierId: string | null;
 }

@@ -8,5 +8,5 @@ export class CreateInvoiceDto {
   generatedFileUrl: string;
 
   @IsString()
-  order_id: string;
+  orderId: string;
 }

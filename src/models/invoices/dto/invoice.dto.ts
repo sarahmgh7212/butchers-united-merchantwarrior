@@ -12,7 +12,7 @@ export class InvoiceDto implements Invoice {
   generatedFileUrl: string;
 
   @Expose({ groups: [] })
-  order_id: string;
+  orderId: string;
 
   @Expose({ groups: [] })
   createdAt: Date;

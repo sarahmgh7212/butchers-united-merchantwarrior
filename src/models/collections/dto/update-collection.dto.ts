@@ -20,17 +20,9 @@ export class UpdateCollectionDto extends PartialType(CreateCollectionDto) {
   @IsIn(Object.values(CollectionStatus))
   status: CollectionStatus;
 
-  @IsOptional()
   @IsString()
-  img_uri: string;
-
   @IsOptional()
-  @IsString()
-  logo_id: string;
-
-  @IsOptional()
-  @IsString()
-  logo_uri: string;
+  logoId: string;
 
   @IsOptional()
   tags: GenericObject | null;

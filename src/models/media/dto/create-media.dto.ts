@@ -11,7 +11,7 @@ export class CreateMediaDto {
   type: MediaType;
 
   @IsString()
-  business_id: string;
+  businessId: string;
 
   @IsString()
   productId: string | null;

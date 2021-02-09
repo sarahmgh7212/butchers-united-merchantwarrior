@@ -1,10 +1,16 @@
-import { PaymentMethod, PaymentMethodStatus } from '@prisma/client';
+import {
+  PaymentMethod,
+  PaymentMethodStatus,
+  PaymentMethodType,
+} from '@prisma/client';
 import { Expose } from 'class-transformer';
 import { GenericObject } from 'src/types';
 
 export class PaymentMethodDto implements PaymentMethod {
   @Expose({ groups: [] })
   id: string;
+  @Expose({ groups: [] })
+  type: PaymentMethodType;
 
   @Expose({ groups: [] })
   provider_type: string;
@@ -17,6 +23,8 @@ export class PaymentMethodDto implements PaymentMethod {
 
   @Expose({ groups: [] })
   data: GenericObject | null;
+  @Expose({ groups: [] })
+  fdCustomerId: string;
 
   @Expose({ groups: [] })
   createdAt: Date;

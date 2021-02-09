@@ -16,15 +16,7 @@ export class CreateCollectionDto {
 
   @IsOptional()
   @IsString()
-  img_uri: string;
-
-  @IsOptional()
-  @IsString()
-  logo_id: string;
-
-  @IsOptional()
-  @IsString()
-  logo_uri: string;
+  logoId: string;
 
   @IsOptional()
   @IsJSON()

@@ -1,20 +1,24 @@
-import { IsEmail, IsIn, IsOptional, IsUUID } from 'class-validator';
+import { InviteStatus } from '@prisma/client';
+import { IsDate, IsEmail, IsIn, IsOptional, IsUUID } from 'class-validator';
 
 export class CreateInviteDto {
   @IsOptional()
-  @IsIn(['ACTIVE', 'USED', 'CANCELLED'])
-  status?: 'ACTIVE' | 'USED' | 'CANCELLED';
+  @IsIn(Object.values(InviteStatus))
+  status: InviteStatus;
 
   @IsEmail()
   email: string;
 
-  @IsUUID()
-  inviter_id: string;
+  @IsDate()
+  consumedAt: Date | null;
 
   @IsUUID()
-  business_id: string;
+  inviterId: string;
+
+  @IsUUID()
+  businessId: string;
 
   @IsOptional()
   @IsUUID()
-  user_id?: string;
+  userId: string;
 }

@@ -19,6 +19,7 @@ import { MediaModelModule } from './models/media/media.model.module';
 import { PlacesModelModule } from './models/places/places.model.module';
 import { OrdersModelModule } from './models/orders/orders.model.module';
 import { OrderItemsModelModule } from './models/order-items/order-items.model.module';
+import { CartsModelModule } from './models/carts/carts.model.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { OrderItemsModelModule } from './models/order-items/order-items.model.mo
     PlacesModelModule,
     OrdersModelModule,
     OrderItemsModelModule,
+    CartsModelModule,
   ],
   controllers: [AppController],
   providers: [AppService],
