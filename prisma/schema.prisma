@@ -222,8 +222,6 @@ model Variant {
   stepQty                             Int                     @map("step_qty")
   minimumQty                          Decimal                 @db.Decimal(15,5)  @map("minimum_qty")
 
-  // Do units belong here
-
   productId                          String                  @db.Uuid @map("product_id")
   discountId                         String                  @db.Uuid @map("discount_id")
   

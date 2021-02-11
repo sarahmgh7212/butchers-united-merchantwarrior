@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
-import { ModelMiddleware } from './types';
+import { ModelMiddleware } from '../types';
 
-export class EntitySoftDeleteMiddleware implements ModelMiddleware {
+export class ModelSoftDeleteMiddleware implements ModelMiddleware {
   private _pDelegate: any;
 
   constructor(prismaDelegate: any) {

@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { ModelMiddleware, ModelMiddlewareMap } from './middleware/types';
+import { ModelMiddleware, ModelMiddlewareMap } from './types';
 
 @Injectable()
 export class PrismaService
@@ -16,7 +16,7 @@ export class PrismaService
       const model = params.model.toLowerCase();
 
       if (!Object.prototype.hasOwnProperty.call(this.modelMiddlewares, model)) {
-        return;
+        return next(params);
       }
 
       const mws = this.modelMiddlewares[model][action] || [];
