@@ -20,8 +20,6 @@ export class FirebaseAuthMiddleware implements NestMiddleware {
   ) {}
 
   async use(req: AuthedRequest, res: Response, next: () => void) {
-    console.log(req.authResult);
-
     if (req.authResult) {
       next();
     }
@@ -50,6 +48,8 @@ export class FirebaseAuthMiddleware implements NestMiddleware {
             req.authResult = AuthenticationResults.NO_LOCAL_USER_PROFILE;
           }
         } catch (e) {
+          //TODO: Add specific error states and only log not known errors
+          console.error(e);
           req.authResult = AuthenticationResults.INVALID_FIREBASE_TOKEN;
         }
       } else {

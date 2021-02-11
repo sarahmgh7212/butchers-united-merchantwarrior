@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModelModule } from './models/products/products.model.module';
@@ -16,6 +16,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { MerchantWarriorModule } from './core/merchant-warrior/merchant-warrior.module';
 import * as admin from 'firebase-admin';
+import { FirebaseAuthMiddleware } from './core/auth/firebase-auth.middleware';
 
 @Module({
   imports: [
@@ -72,4 +73,8 @@ import * as admin from 'firebase-admin';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  public configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(FirebaseAuthMiddleware).forRoutes('*');
+  }
+}
