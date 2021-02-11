@@ -41,13 +41,13 @@ export class ProductsModelController extends ResourceController<
   })
   @ApiOkResponse({ type: [CreateProductDto] })
   @Get()
-  findMany(@Query() query: FilterProductsDto): Promise<Product[]> {
+  list(@Query() query: FilterProductsDto): Promise<Product[]> {
     return super.findMany(query);
   }
 
   @ApiOkResponse({ type: ProductDto })
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Product> {
+  get(@Param('id') id: string): Promise<Product> {
     return super.findUnique(id);
   }
 
