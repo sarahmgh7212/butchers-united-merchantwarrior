@@ -1,5 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CoreLogger } from './core/core-logger/core.logger';
 
 export function configureApp(app: INestApplication) {
   app.useGlobalPipes(
@@ -10,6 +11,8 @@ export function configureApp(app: INestApplication) {
       forbidNonWhitelisted: true,
     }),
   );
+
+  app.useLogger(app.get(CoreLogger));
 
   if (['development', 'staging'].includes(process.env.NODE_ENV)) {
     const options = new DocumentBuilder()

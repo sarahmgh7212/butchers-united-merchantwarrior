@@ -32,6 +32,8 @@ import { join } from 'path';
 import { MerchantWarriorModule } from './core/merchant-warrior/merchant-warrior.module';
 import * as admin from 'firebase-admin';
 import { FirebaseAuthMiddleware } from './core/auth/firebase-auth.middleware';
+import { CoreLoggerService } from './core/core-logger/core.logger';
+import { CoreLoggerModule } from './core/core-logger/core.logger.module';
 
 @Module({
   imports: [
@@ -102,9 +104,10 @@ import { FirebaseAuthMiddleware } from './core/auth/firebase-auth.middleware';
     OrdersModelModule,
     OrderItemsModelModule,
     CartsModelModule,
+    CoreLoggerModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CoreLoggerService],
 })
 export class AppModule {
   public configure(consumer: MiddlewareConsumer): void {
