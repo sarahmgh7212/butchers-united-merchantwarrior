@@ -34,6 +34,7 @@ import * as admin from 'firebase-admin';
 import { FirebaseAuthMiddleware } from './core/auth/firebase-auth.middleware';
 import { CoreLoggerService } from './core/core-logger/core.logger';
 import { CoreLoggerModule } from './core/core-logger/core.logger.module';
+import { JobsModule } from './core/jobs/jobs.module';
 
 @Module({
   imports: [
@@ -105,6 +106,7 @@ import { CoreLoggerModule } from './core/core-logger/core.logger.module';
     OrderItemsModelModule,
     CartsModelModule,
     CoreLoggerModule,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [AppService, CoreLoggerService],

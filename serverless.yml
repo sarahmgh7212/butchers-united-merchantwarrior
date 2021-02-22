@@ -1,0 +1,98 @@
+org: villageco
+app: vsc
+
+service: core-api
+useDotenv: true
+
+provider:
+  name: aws
+  region: ap-southeast-2
+  stage: ${opt:stage, 'staging'}
+  runtime: nodejs12.x
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - events:PutEvents
+      Resource:
+        - arn:aws:events:#{AWS::Region}:#{AWS::AccountId}:event-bus/${self:custom.eventBus}
+  apiGateway:
+    shouldStartNameWithService: true
+  tags:
+    module: 'core'
+    app: ${self:app}
+    service: ${self:service}
+  tracing:
+    apiGateway: true
+    lambda: true
+
+functions:
+  api:
+    handler: src/handlers/api.handler
+    timeout: 29
+    environment:
+      SENDGRID_API_KEY: ${ssm:/core/api/${self:provider.stage}/sendgrid-api-key~true, env:SENDGRID_API_KEY}
+      DATABASE_URL: ${ssm:/core/api/${self:provider.stage}/database-url~true, env:DATABASE_URL}
+      # STRIPE_API_KEY: ${ssm:/core/api/${self:provider.stage}/stripe-api-key~true, env:STRIPE_API_KEY}
+      # STRIPE_WEBHOOK_SECRET: ${ssm:/core/api/${self:provider.stage}/stripe-webhook-secret~true, env:STRIPE_WEBHOOK_SECRET}
+      # DEFAULT_CURRENCY: ${ssm:/core/api/${self:provider.stage}/default-currency, env:DEFAULT_CURRENCY}
+      # TAX_RATE_ID: ${ssm:/core/api/${self:provider.stage}/tax-rate-id~true, env:TAX_RATE_ID}
+      APP_URL: ${ssm:/core/api/${self:provider.stage}/app-url, env:APP_URL}
+      FIREBASE_SA_KEY: './firebase_sa_credentials.json'
+      EVENT_BUS_NAME: ${ssm:/core/api/${self:provider.stage}/event-bus-name, env:EVENT_BUS_NAME}
+    events:
+      - http:
+          method: any
+          path: /{any+}
+          cors: true
+
+  jobs:
+    handler: src/handlers/jobs.handler
+    environment: ${self:functions.api.environment}
+    events:
+      - eventBridge:
+          eventBus: ${self:custom.eventBus}
+          pattern:
+            detail-type:
+              - job
+
+  # migrate:
+  #   handler: src/handlers/migrate.handler
+  #   # optimize:
+  #   #   minify: false
+  #   environment:
+  #     DATABASE_URL: ${ssm:/core/api/${self:provider.stage}/database-url~true, env:DATABASE_URL}
+
+package:
+  individually: true
+  include:
+    - prisma/**
+    - firebase_sa_credentials.json
+    - .env
+
+custom:
+  eventBus: ${self:provider.stage}-events
+  domain:
+    staging: api.s.hellocourses.com.au
+    production: api.hellocourses.com.au
+  customDomain:
+    basePath: ''
+    domainName: ${self:custom.domain.${self:provider.stage}}
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    includeModules: true
+    packagerOptions:
+      scripts: # this is the magic
+        - npx prisma generate
+  serverless-offline-aws-eventbridge:
+    port: 4010 # port to run the eventbridge mock server on
+    debug: true # flag to show debug messages
+    account: '1234' # account id that gets passed to the event
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+  - serverless-offline-aws-eventbridge
+  - serverless-domain-manager
+  - serverless-pseudo-parameters
