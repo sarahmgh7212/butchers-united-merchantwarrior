@@ -1,4 +1,9 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  INestApplication,
+  UnprocessableEntityException,
+  ValidationError,
+  ValidationPipe,
+} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { CoreLogger } from './core/core-logger/core.logger';
 
@@ -9,6 +14,16 @@ export function configureApp(app: INestApplication) {
       transformOptions: { enableImplicitConversion: true },
       whitelist: true,
       forbidNonWhitelisted: true,
+      exceptionFactory: (validationErrors: ValidationError[]) => {
+        // const errors = this.flattenValidationErrors(validationErrors);
+        // const formattedErrors = errors.map(e => {
+
+        //   return {
+
+        //   }
+        // });
+        return new UnprocessableEntityException(validationErrors);
+      },
     }),
   );
 

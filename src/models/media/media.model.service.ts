@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Media } from '@prisma/client';
 import { PrismaService } from '../../core/prisma/prisma.service';
-import { PrismaEntityService } from '../../libs/resources/types';
+import { ModelService } from '../../libs/resources/types';
 
 @Injectable()
-export class MediaModelService implements PrismaEntityService {
+export class MediaModelService implements ModelService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findMany(args?: Prisma.MediaFindManyArgs): Promise<Media[]> {

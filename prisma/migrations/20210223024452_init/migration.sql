@@ -64,7 +64,7 @@ CREATE TYPE "TransactionType" AS ENUM ('CHARGE', 'REFUND', 'ADJUSTMENT');
 
 -- CreateTable
 CREATE TABLE "users_invites" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "first_opened_at" TIMESTAMPTZ,
     "status" "InviteStatus" NOT NULL DEFAULT E'ACTIVE',
     "expires_at" TIMESTAMPTZ NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE "users_invites" (
 
 -- CreateTable
 CREATE TABLE "users_users" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "name" TEXT NOT NULL,
     "mobile_number" TEXT,
     "notifications_provider_id" TEXT,
@@ -102,7 +102,7 @@ CREATE TABLE "users_users" (
 
 -- CreateTable
 CREATE TABLE "users_password_resets" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "access_code" TEXT NOT NULL,
     "status" "PasswordResetStatus" NOT NULL DEFAULT E'ACTIVE',
     "expires_at" TIMESTAMPTZ NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE "users_password_resets" (
 
 -- CreateTable
 CREATE TABLE "customers_customers" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "customerable_id" UUID,
     "customerable_type" "CustomerableType" NOT NULL,
     "tags" JSONB,
@@ -129,7 +129,7 @@ CREATE TABLE "customers_customers" (
 
 -- CreateTable
 CREATE TABLE "businesses_businesses" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "name" TEXT NOT NULL,
     "abn" TEXT NOT NULL,
     "logo_uri" TEXT,
@@ -158,7 +158,7 @@ CREATE TABLE "businesses_businesses_users" (
 
 -- CreateTable
 CREATE TABLE "products_products" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "external_reference" TEXT,
@@ -182,7 +182,7 @@ CREATE TABLE "products_products" (
 
 -- CreateTable
 CREATE TABLE "products_variant" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "status" "VariantStatus" NOT NULL DEFAULT E'ACTIVE',
     "description" TEXT NOT NULL,
     "sell_ex" DECIMAL(12,2) NOT NULL,
@@ -206,7 +206,7 @@ CREATE TABLE "products_variant" (
 
 -- CreateTable
 CREATE TABLE "products_availability_rule" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "status" "AvailabilityRulesStatus" NOT NULL DEFAULT E'ACTIVE',
     "type" "RuleType" NOT NULL,
     "region_ids" TEXT[],
@@ -223,7 +223,7 @@ CREATE TABLE "products_availability_rule" (
 
 -- CreateTable
 CREATE TABLE "products_discount" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "name" TEXT NOT NULL,
     "status" "DiscountStatus" NOT NULL DEFAULT E'ACTIVE',
     "start_at" TIMESTAMPTZ,
@@ -237,7 +237,7 @@ CREATE TABLE "products_discount" (
 
 -- CreateTable
 CREATE TABLE "products_discount_value" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "type" "DiscountValueType" NOT NULL,
     "gtQty" DECIMAL(15,5) NOT NULL DEFAULT 0,
     "ltQty" DECIMAL(15,5) NOT NULL DEFAULT 10000000000000000,
@@ -254,7 +254,7 @@ CREATE TABLE "products_discount_value" (
 
 -- CreateTable
 CREATE TABLE "products_brands" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "status" "BrandStatus" NOT NULL DEFAULT E'ACTIVE',
     "name" TEXT NOT NULL,
     "logo_id" UUID NOT NULL,
@@ -268,7 +268,7 @@ CREATE TABLE "products_brands" (
 
 -- CreateTable
 CREATE TABLE "products_units" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "singular" TEXT NOT NULL,
     "abbreviation" TEXT NOT NULL,
     "status" "ProductUnitStatus" NOT NULL DEFAULT E'ACTIVE',
@@ -281,7 +281,7 @@ CREATE TABLE "products_units" (
 
 -- CreateTable
 CREATE TABLE "products_collections" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "status" "CollectionStatus" NOT NULL DEFAULT E'ACTIVE',
@@ -296,7 +296,7 @@ CREATE TABLE "products_collections" (
 
 -- CreateTable
 CREATE TABLE "products_media" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "status" "MediaStatus" NOT NULL DEFAULT E'ACTIVE',
     "label" TEXT NOT NULL,
     "type" "MediaType" NOT NULL,
@@ -311,7 +311,7 @@ CREATE TABLE "products_media" (
 
 -- CreateTable
 CREATE TABLE "orders_order_items" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "qty_ordered" INTEGER NOT NULL,
     "qty_received" INTEGER,
     "sell_ex" DECIMAL(12,2) NOT NULL,
@@ -329,7 +329,7 @@ CREATE TABLE "orders_order_items" (
 
 -- CreateTable
 CREATE TABLE "orders_orders" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "order_ref" SERIAL NOT NULL,
     "completed_at" TIMESTAMPTZ,
     "shipped_at" TIMESTAMPTZ,
@@ -349,7 +349,7 @@ CREATE TABLE "orders_orders" (
 
 -- CreateTable
 CREATE TABLE "orders_carts" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "data" JSONB NOT NULL,
     "fd_customer_id" UUID NOT NULL,
     "fd_user_id" UUID NOT NULL,
@@ -359,7 +359,7 @@ CREATE TABLE "orders_carts" (
 
 -- CreateTable
 CREATE TABLE "orders_invoices" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "invoice_ref" SERIAL NOT NULL,
     "generated_file_url" TEXT NOT NULL,
     "order_id" UUID NOT NULL,
@@ -372,7 +372,7 @@ CREATE TABLE "orders_invoices" (
 
 -- CreateTable
 CREATE TABLE "payments_payment_methods" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "type" "PaymentMethodType" NOT NULL,
     "status" "PaymentMethodStatus" NOT NULL DEFAULT E'ACTIVE',
     "data" JSONB,
@@ -386,7 +386,7 @@ CREATE TABLE "payments_payment_methods" (
 
 -- CreateTable
 CREATE TABLE "payments_payments" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "receipt_number" SERIAL,
     "notes" TEXT,
     "amount" DECIMAL(12,2),
@@ -406,7 +406,7 @@ CREATE TABLE "payments_payments" (
 
 -- CreateTable
 CREATE TABLE "places_places" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "countryCode" TEXT NOT NULL,
     "stateCode" TEXT NOT NULL,
     "suburb" TEXT NOT NULL,
@@ -425,7 +425,7 @@ CREATE TABLE "places_places" (
 
 -- CreateTable
 CREATE TABLE "places_regions" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "name" TEXT NOT NULL,
     "polygon" polygon,
     "business_id" UUID,

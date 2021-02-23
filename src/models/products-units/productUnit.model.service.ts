@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, ProductUnit } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma/prisma.service';
-import { PrismaEntityService } from 'src/libs/resources/types';
+import { ModelService } from 'src/libs/resources/types';
 
 @Injectable()
-export class ProductUnitModelService implements PrismaEntityService {
+export class ProductUnitModelService implements ModelService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findMany(

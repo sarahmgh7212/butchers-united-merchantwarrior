@@ -1,6 +1,6 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import { AuthedRequest } from './firebase-auth.middleware';
+import type { AuthedRequest } from './auth.types';
 
 @Injectable({ scope: Scope.REQUEST })
 export class AuthService {

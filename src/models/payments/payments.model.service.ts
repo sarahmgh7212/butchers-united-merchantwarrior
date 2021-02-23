@@ -1,21 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, PaymentMethod } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma/prisma.service';
-import { PrismaEntityService } from 'src/libs/resources/types';
+import { ModelService } from 'src/libs/resources/types';
 
 @Injectable()
-export class PaymentsModelService implements PrismaEntityService {
+export class PaymentsModelService implements ModelService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findMany(args?: Prisma.PaymentMethodFindManyArgs): Promise<PaymentMethod[]> {
+  async findMany(
+    args?: Prisma.PaymentMethodFindManyArgs,
+  ): Promise<PaymentMethod[]> {
     return this.prisma.paymentMethod.findMany(args);
   }
 
-  async findFirst(args?: Prisma.PaymentMethodFindFirstArgs): Promise<PaymentMethod> {
+  async findFirst(
+    args?: Prisma.PaymentMethodFindFirstArgs,
+  ): Promise<PaymentMethod> {
     return this.prisma.paymentMethod.findFirst(args);
   }
 
-  async findUnique(args?: Prisma.PaymentMethodFindUniqueArgs): Promise<PaymentMethod> {
+  async findUnique(
+    args?: Prisma.PaymentMethodFindUniqueArgs,
+  ): Promise<PaymentMethod> {
     return this.prisma.paymentMethod.findUnique(args);
   }
 

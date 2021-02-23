@@ -38,7 +38,7 @@ export type DeleteArgs = BaseOneArgs;
 
 export type DeleteManyArgs = BaseManyArgs;
 
-export interface PrismaEntityService {
+export interface ModelService {
   findMany(args?: any): Promise<any[]>;
   findFirst(args?: any): Promise<any>;
   findUnique(args?: any): Promise<any>;

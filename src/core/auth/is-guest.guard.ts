@@ -5,8 +5,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { AuthedRequest } from './firebase-auth.middleware';
-import { AuthenticationResults, UnauthorizedCodes } from './types';
+import {
+  AuthedRequest,
+  AuthenticationResults,
+  UnauthorizedCodes,
+} from './auth.types';
 
 @Injectable()
 export class IsGuestGuard implements CanActivate {

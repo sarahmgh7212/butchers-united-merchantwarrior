@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { ModelMiddleware } from '../types';
+import { ModelMiddleware, PrismaNextMiddleware } from '../prisma.types';
 
 export class ModelSoftDeleteMiddleware implements ModelMiddleware {
   private _pDelegate: any;
@@ -8,24 +8,47 @@ export class ModelSoftDeleteMiddleware implements ModelMiddleware {
     this._pDelegate = prismaDelegate;
   }
 
-  public async findMany(params: Prisma.MiddlewareParams): Promise<void> {
+  public async findMany(
+    params: Prisma.MiddlewareParams,
+    next: PrismaNextMiddleware,
+  ): Promise<void> {
     params.args.where = this.getWhere(params.args.where);
+
+    return next(params);
   }
 
-  async findFirst(params: Prisma.MiddlewareParams): Promise<void> {
+  async findFirst(
+    params: Prisma.MiddlewareParams,
+    next: PrismaNextMiddleware,
+  ): Promise<void> {
     params.args.where = this.getWhere(params.args.where);
+
+    return next(params);
   }
 
-  async findUnique(params: Prisma.MiddlewareParams): Promise<void> {
+  async findUnique(
+    params: Prisma.MiddlewareParams,
+    next: PrismaNextMiddleware,
+  ): Promise<void> {
     params.args.where = this.getWhere(params.args.where);
     params.action = 'findFirst';
+
+    return next(params);
   }
 
-  async count(params: Prisma.MiddlewareParams): Promise<void> {
+  async count(
+    params: Prisma.MiddlewareParams,
+    next: PrismaNextMiddleware,
+  ): Promise<void> {
     params.args.where = this.getWhere(params.args.where);
+
+    return next(params);
   }
 
-  async update(params: Prisma.MiddlewareParams): Promise<void> {
+  async update(
+    params: Prisma.MiddlewareParams,
+    next: PrismaNextMiddleware,
+  ): Promise<void> {
     const existCount = await this._pDelegate.count({
       where: this.getWhere(params.args.where),
     });
@@ -33,13 +56,23 @@ export class ModelSoftDeleteMiddleware implements ModelMiddleware {
     if (!existCount) {
       throw new Error('Not Found');
     }
+
+    return next(params);
   }
 
-  async updateMany(params: Prisma.MiddlewareParams): Promise<void> {
+  async updateMany(
+    params: Prisma.MiddlewareParams,
+    next: PrismaNextMiddleware,
+  ): Promise<void> {
     params.args.where = this.getWhere(params.args.where);
+
+    return next(params);
   }
 
-  async delete(params: Prisma.MiddlewareParams): Promise<void> {
+  async delete(
+    params: Prisma.MiddlewareParams,
+    next: PrismaNextMiddleware,
+  ): Promise<void> {
     if (!params.args.where?._destroy) {
       const existCount = await this._pDelegate.count({
         where: this.getWhere(params.args.where),
@@ -53,15 +86,22 @@ export class ModelSoftDeleteMiddleware implements ModelMiddleware {
       params.args.data.deletedAt = new Date();
       params.action = 'update';
     }
+
+    return next(params);
   }
 
-  async deleteMany(params: Prisma.MiddlewareParams): Promise<void> {
+  async deleteMany(
+    params: Prisma.MiddlewareParams,
+    next: PrismaNextMiddleware,
+  ): Promise<void> {
     if (!params.args.where?._destroy) {
       params.args.where = this.getWhere(params.args.where);
       params.args.data = {};
       params.args.data.deletedAt = new Date();
       params.action = 'updateMany';
     }
+
+    return next(params);
   }
 
   getWhere(inputWhere: { [key: string]: any }) {

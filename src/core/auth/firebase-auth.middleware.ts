@@ -1,16 +1,8 @@
 import { FirebaseAuthenticationService } from '@aginix/nestjs-firebase-admin';
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { Request, Response } from 'express';
-import { auth } from 'firebase-admin';
+import { Response } from 'express';
 import { UsersModelService } from 'src/models/users/users.model.service';
-import { AuthenticationResults } from './types';
-
-export interface AuthedRequest extends Request {
-  authResult?: AuthenticationResults;
-  firebaseUser?: auth.DecodedIdToken;
-  authedUser?: User;
-}
+import { AuthedRequest, AuthenticationResults } from './auth.types';
 
 @Injectable()
 export class FirebaseAuthMiddleware implements NestMiddleware {
