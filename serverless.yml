@@ -39,6 +39,7 @@ functions:
       APP_URL: ${ssm:/core/api/${self:provider.stage}/app-url, env:APP_URL}
       FIREBASE_SA_KEY: './firebase_sa_credentials.json'
       EVENT_BUS_NAME: ${ssm:/core/api/${self:provider.stage}/event-bus-name, env:EVENT_BUS_NAME}
+      NO_COLOR: ${ssm:/core/api/${self:provider.stage}/no-color, env:NO_COLOR}
     events:
       - http:
           method: any

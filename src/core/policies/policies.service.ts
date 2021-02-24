@@ -1,38 +1,48 @@
-import {
-  DiscoveredClassWithMeta,
-  DiscoveryService,
-} from '@golevelup/nestjs-discovery';
-import {
-  Injectable,
-  OnModuleInit,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { DiscoveryService } from '@golevelup/nestjs-discovery';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { PinoLogger } from 'nestjs-pino';
 import { isFunction } from 'src/libs/helpers/is-function';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ModelMiddleware } from '../prisma/prisma.types';
 import { POLICY_MODEL_NAME } from './policies.constants';
-import { Policy, PolicyWrappedModelService } from './policies.types';
+import { PolicyActions, PolicyConstructor, PolicyMap } from './policies.types';
+import { Policy } from './policy';
 
 @Injectable()
 export class PoliciesService implements OnModuleInit {
+  private readonly policyMap: PolicyMap;
+
   constructor(
     private readonly discover: DiscoveryService,
     private readonly authService: AuthService,
     private readonly prisma: PrismaService,
-  ) {}
+    private readonly logger: PinoLogger,
+  ) {
+    this.policyMap = {};
+    this.logger.setContext(PoliciesService.name);
+  }
 
   async onModuleInit() {
-    const providers = await this.discover.providersWithMetaAtKey<Policy<any>>(
+    this.logger.debug('Starting policy provider search');
+
+    const providers = await this.discover.providersWithMetaAtKey<string>(
       POLICY_MODEL_NAME,
     );
 
-    providers.forEach(this.registerPolicy);
+    providers.forEach((p) =>
+      this.registerPolicy(
+        p.discoveredClass.dependencyType as PolicyConstructor<any>,
+        p.meta,
+      ),
+    );
 
-    // console.log(Object.keys(this.policyMap));
+    this.logger.debug('Auto policy registration complete', {
+      policyMap: this.policyMap,
+    });
   }
 
-  registerPolicy(policyClass: any, model: string) {
+  registerPolicy<T>(policyClass: PolicyConstructor<T>, model: string) {
     const policy = new policyClass() as Policy<any>;
 
     const modelMiddleware: ModelMiddleware = {};
@@ -42,7 +52,7 @@ export class PoliciesService implements OnModuleInit {
     if (isFunction(policy.list)) {
       modelMiddleware.count = (params, next) => {
         if (!policy.list(authService.authedUser)) {
-          throw new UnauthorizedException();
+          throw new policy.options.cannotException();
         }
 
         return next(params);
@@ -50,7 +60,7 @@ export class PoliciesService implements OnModuleInit {
 
       modelMiddleware.findMany = (params, next) => {
         if (!policy.list(authService.authedUser)) {
-          throw new UnauthorizedException();
+          throw new policy.options.cannotException();
         }
 
         return next(params);
@@ -62,7 +72,7 @@ export class PoliciesService implements OnModuleInit {
         const rec = await next(params);
 
         if (rec && !policy.view(authService.authedUser, rec)) {
-          throw new UnauthorizedException();
+          throw new policy.options.cannotException();
         }
 
         return rec;
@@ -89,7 +99,7 @@ export class PoliciesService implements OnModuleInit {
     if (isFunction(policy.create)) {
       modelMiddleware.create = (params, next) => {
         if (!policy.create(authService.authedUser)) {
-          throw new UnauthorizedException();
+          throw new policy.options.cannotException();
         }
 
         return next(params);
@@ -101,7 +111,7 @@ export class PoliciesService implements OnModuleInit {
         const rec = await prisma[model].findFirst({ where: params.args.where });
 
         if (policy.update(authService.authedUser, rec)) {
-          throw new UnauthorizedException();
+          throw new policy.options.cannotException();
         }
 
         return next(params);
@@ -131,7 +141,7 @@ export class PoliciesService implements OnModuleInit {
         const rec = await prisma[model].findFirst({ where: params.args.where });
 
         if (policy.delete(authService.authedUser, rec)) {
-          throw new UnauthorizedException();
+          throw new policy.options.cannotException();
         }
 
         return next(params);
@@ -157,7 +167,7 @@ export class PoliciesService implements OnModuleInit {
         const rec = await prisma[model].findFirst({ where: params.args.where });
 
         if (policy.destroy(authService.authedUser, rec)) {
-          throw new UnauthorizedException();
+          throw new policy.options.cannotException();
         }
 
         return next(params);
@@ -197,108 +207,17 @@ export class PoliciesService implements OnModuleInit {
     }
 
     this.prisma.registerModelMiddleware(model, modelMiddleware);
+    this.policyMap[model] = policy;
   }
 
-  registerPolicy(provider: DiscoveredClassWithMeta<Policy<any>>) {
-    // @ts-expect-error TODO: REMOVE
-    const policy = new provider.meta() as Policy<any>;
-    const modelService = provider.discoveredClass
-      .instance as PolicyWrappedModelService;
-
-    modelService.wrappedServices[policy.constructor.name] = {};
-    const wrapper = modelService.wrappedServices[policy.constructor.name];
-
-    const authService = this.authService;
-
-    if (
-      isFunction(modelService.findMany) &&
-      (isFunction(policy.list) || isFunction(policy.view))
-    ) {
-      wrapper.findMany = modelService.findMany;
-
-      const listFn = isFunction(policy.list) ? policy.list : () => true;
-
-      modelService.findMany = (async (args) => {
-        if (!listFn(authService.authedUser)) {
-          throw new UnauthorizedException();
-        }
-
-        const res = await wrapper.findMany(args);
-
-        // CHRIS SHOULD THIS BE A SOME OR A FILTER?
-
-        return res;
-      }).bind(modelService);
+  canUser<T>(action: PolicyActions, modelName: string, model?: T) {
+    if (['view', 'update', 'delete', 'destroy'].includes(action) && !model) {
+      throw new Error(`Must pass a model instance for action '${action}'`);
     }
 
-    if (isFunction(modelService.count) && isFunction(policy.list)) {
-      wrapper.count = modelService.count;
-
-      modelService.count = async (args) => {};
-    }
-
-    if (isFunction(modelService.findFirst) && isFunction(policy.view)) {
-      wrapper.findFirst = modelService.findFirst;
-
-      modelService.findFirst = (async (args) => {
-        const res = await wrapper.findFirst(args);
-
-        if (!policy.view(user, res)) {
-          throw new UnauthorizedException(); // OR NOT FOUND?
-        }
-
-        return res;
-      }).bind(modelService);
-    }
-
-    if (isFunction(modelService.findUnique) && isFunction(policy.view)) {
-      wrapper.findUnique = modelService.findUnique;
-
-      modelService.findUnique = (async (args) => {
-        const res = await wrapper.findUnique(args);
-
-        if (!policy.view(user, res)) {
-          throw new UnauthorizedException(); // OR NOT FOUND?
-        }
-
-        return res;
-      }).bind(modelService);
-    }
-
-    if (isFunction(modelService.create) && isFunction(policy.create)) {
-      wrapper.create = modelService.create;
-
-      modelService.create = (async (args) => {
-        if (!policy.create(user)) {
-          throw new UnauthorizedException();
-        }
-
-        return wrapper.create(args);
-      }).bind(modelService);
-    }
-
-    if (isFunction(modelService.update)) {
-      wrapper.update = modelService.update;
-
-      modelService.update = (async (args) => {}).bind(modelService);
-    }
-
-    if (isFunction(modelService.updateMany)) {
-      wrapper.updateMany = modelService.updateMany;
-
-      modelService.updateMany = (async (args) => {}).bind(modelService);
-    }
-
-    if (isFunction(modelService.delete)) {
-      wrapper.delete = modelService.delete;
-
-      modelService.delete = (async (args) => {}).bind(modelService);
-    }
-
-    if (isFunction(modelService.deleteMany)) {
-      wrapper.deleteMany = modelService.deleteMany;
-
-      modelService.deleteMany = (async (args) => {}).bind(modelService);
-    }
+    return this.policyMap[modelName][action](
+      this.authService.authedUser,
+      model,
+    );
   }
 }

@@ -1,4 +1,6 @@
 import { Product } from '@prisma/client';
-import { Policy } from 'src/core/policies/policies.types';
+import { RegisterPolicy } from 'src/core/policies/policies.decorators';
+import { Policy } from 'src/core/policies/policy';
 
-export class ProductsPolicy implements Policy<Product> {}
+@RegisterPolicy('product')
+export class ProductsPolicy extends Policy<Product> {}

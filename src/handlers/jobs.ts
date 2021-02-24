@@ -3,12 +3,15 @@ import { ContextIdFactory, NestFactory } from '@nestjs/core';
 import { Context, Handler } from 'aws-lambda';
 import { JobsService } from '../core/jobs/jobs.service';
 import { AppModule } from '../app.module';
+import { configureAppContext } from 'src/configure-app';
 
 let cachedApp: INestApplicationContext;
 
 async function bootstrapApp(): Promise<INestApplicationContext> {
   if (!cachedApp) {
-    cachedApp = await NestFactory.createApplicationContext(AppModule);
+    const appCtx = await NestFactory.createApplicationContext(AppModule);
+    configureAppContext(appCtx);
+    cachedApp = appCtx;
   }
 
   return cachedApp;
@@ -27,8 +30,6 @@ export const handler: Handler = async (event: any, context: Context) => {
     instance,
     contextId,
   );
-
-  console.log(`Result: ${result}`);
 
   return;
 };

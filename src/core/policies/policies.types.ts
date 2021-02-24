@@ -1,17 +1,24 @@
-import { AuthedUser } from 'src/core/auth/auth.types';
-import { ModelService } from 'src/libs/resources/types';
+import { HttpExceptionConstructor } from 'src/libs/helpers/helpers.types';
+import { Policy } from './policy';
 
-export interface Policy<T> {
-  list?: (user: AuthedUser) => boolean; //-
-  view?: (user: AuthedUser, model: T) => boolean; //user & model
-  create?: (user: AuthedUser) => boolean; //-
-  update?: (user: AuthedUser, model: T) => boolean; //user & model
-  delete?: (user: AuthedUser, model: T) => boolean; //user & model
-  destroy?: (user: AuthedUser, model: T) => boolean; //user & model
+export interface PolicyConstructor<T> {
+  new (options?: PolicyOptions): Policy<T>;
 }
 
-export interface PolicyWrappedModelService extends ModelService {
-  wrappedServices: { [key: string]: Partial<ModelService> };
+export type PolicyActions =
+  | 'list'
+  | 'view'
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'destroy';
+
+export interface BasePolicyOptions {
+  cannotException: HttpExceptionConstructor;
 }
 
-export interface PolicyOptions {}
+export type PolicyOptions = Partial<BasePolicyOptions>;
+
+export interface PolicyMap {
+  [key: string]: Policy<any>;
+}
