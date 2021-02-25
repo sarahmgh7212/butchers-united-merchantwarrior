@@ -3,12 +3,16 @@ import { ContextIdFactory, NestFactory } from '@nestjs/core';
 import { Context, Handler } from 'aws-lambda';
 import { JobsService } from '../core/jobs/jobs.service';
 import { AppModule } from '../app.module';
+import { configureAppContext } from 'src/configure-app';
+import { PoliciesService } from 'src/core/policies/policies.service';
 
 let cachedApp: INestApplicationContext;
 
 async function bootstrapApp(): Promise<INestApplicationContext> {
   if (!cachedApp) {
-    cachedApp = await NestFactory.createApplicationContext(AppModule);
+    const appCtx = await NestFactory.createApplicationContext(AppModule);
+    configureAppContext(appCtx);
+    cachedApp = appCtx;
   }
 
   return cachedApp;
@@ -21,14 +25,16 @@ export const handler: Handler = async (event: any, context: Context) => {
   instance.registerRequestByContextId({ context }, contextId);
 
   const service = await instance.resolve<JobsService>(JobsService, contextId);
+  const service2 = await instance.resolve<PoliciesService>(
+    PoliciesService,
+    contextId,
+  );
   const result = await service.process(
     event.detail.job,
     event.detail.data,
     instance,
     contextId,
   );
-
-  console.log(`Result: ${result}`);
 
   return;
 };

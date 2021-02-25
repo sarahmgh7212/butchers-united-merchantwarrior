@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Cart } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma/prisma.service';
-import { PrismaEntityService } from 'src/libs/resources/types';
+import { ModelService } from 'src/libs/resources/types';
 
 @Injectable()
-export class CartsModelService implements PrismaEntityService {
+export class CartsModelService implements ModelService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findMany(args?: Prisma.CartFindManyArgs): Promise<Cart[]> {

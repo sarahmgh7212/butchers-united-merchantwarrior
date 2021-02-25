@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Collection } from '@prisma/client';
 import { PrismaService } from '../../core/prisma/prisma.service';
-import { PrismaEntityService } from '../../libs/resources/types';
+import { ModelService } from '../../libs/resources/types';
 
 @Injectable()
-export class CollectionsModelService implements PrismaEntityService {
+export class CollectionsModelService implements ModelService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findMany(args?: Prisma.CollectionFindManyArgs): Promise<Collection[]> {

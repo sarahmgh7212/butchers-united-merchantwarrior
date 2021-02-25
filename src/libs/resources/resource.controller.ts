@@ -8,7 +8,7 @@ import {
   FindFirstArgs,
   FindManyArgs,
   FindUniqueArgs,
-  PrismaEntityService,
+  ModelService,
   UpdateArgs,
   UpdateManyArgs,
 } from './types';
@@ -50,7 +50,7 @@ export class ResourceController<
   M,
   CDTO,
   UDTO,
-  CS extends PrismaEntityService, //<M, FM, FF, FO, C, U, UM, D, DM>,
+  CS extends ModelService, //<M, FM, FF, FO, C, U, UM, D, DM>,
   FM extends FindManyArgs = FindManyArgs,
   FF extends FindFirstArgs = FindFirstArgs,
   FO extends FindUniqueArgs = FindUniqueArgs,

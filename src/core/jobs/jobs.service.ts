@@ -10,6 +10,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ContextId } from '@nestjs/core';
 import * as AWS from 'aws-sdk';
+import { PinoLogger } from 'nestjs-pino';
 import { JOB_NAME } from './jobs.constants';
 import { JobHandler } from './jobs.types';
 
@@ -21,8 +22,10 @@ export class JobsService implements OnModuleInit {
   constructor(
     private readonly discover: DiscoveryService,
     private readonly configService: ConfigService,
+    private readonly logger: PinoLogger,
   ) {
     this.handlerMap = {};
+    this.logger.setContext(JobsService.name);
 
     if (['development', 'staging'].includes(process.env.NODE_ENV)) {
       this.eventBridge = new AWS.EventBridge({
@@ -37,13 +40,17 @@ export class JobsService implements OnModuleInit {
   }
 
   async onModuleInit() {
+    this.logger.debug('Starting job handler search');
+
     const methods = await this.discover.providerMethodsWithMetaAtKey<string>(
       JOB_NAME,
     );
 
     methods.forEach(this.registerHandler);
 
-    // console.log(Object.keys(this.handlerMap));
+    this.logger.debug('Auto handler registration complete', {
+      policyMap: this.handlerMap,
+    });
   }
 
   registerHandler(method: DiscoveredMethodWithMeta<string>) {
@@ -80,7 +87,10 @@ export class JobsService implements OnModuleInit {
       ],
     };
 
-    return this.eventBridge.putEvents(params).promise();
+    const prom = this.eventBridge.putEvents(params).promise();
+    this.logger.debug('Job triggered', { eventBridgeParams: params });
+
+    return prom;
   }
 
   async process(
@@ -96,6 +106,10 @@ export class JobsService implements OnModuleInit {
     const handler = this.handlerMap[job];
     const service = await instance.resolve(handler.providerClass, contextId);
 
-    await service[handler.methodName](data);
+    this.logger.debug('Job processing', { job, data, contextId });
+    const result = await service[handler.methodName](data);
+    this.logger.debug('Job completed', { job, result, contextId });
+
+    return result;
   }
 }

@@ -21,7 +21,7 @@ enum InviteStatus {
 
 model Invite {
   @@map(name: "users_invites")
-  id                                 String                   @id @default(dbgenerated()) @db.Uuid
+  id                                 String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   firstOpenedAt                      DateTime?                @db.Timestamptz() @map("first_opened_at")
   status                             InviteStatus             @default(ACTIVE)
   expiresAt                          DateTime                 @db.Timestamptz() @map("expires_at")
@@ -48,7 +48,7 @@ enum UserStatus {
 
 model User {
   @@map(name: "users_users")
-  id                                 String                   @id @default(dbgenerated()) @db.Uuid
+  id                                 String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name                               String
   mobileNumber                       String?                  @unique @map("mobile_number")
   notificationsProviderId            String?                  @map("notifications_provider_id")
@@ -79,7 +79,7 @@ enum PasswordResetStatus {
 
 model PasswordReset {
   @@map(name: "users_password_resets")
-  id                                 String                   @id @default(dbgenerated()) @db.Uuid
+  id                                 String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   accessCode                         String                   @map("access_code")
   status                             PasswordResetStatus      @default(ACTIVE)
   expiresAt                          DateTime                 @db.Timestamptz() @map("expires_at")
@@ -102,7 +102,7 @@ enum CustomerableType {
 
 model Customer {
   @@map(name: "customers_customers")
-  id                                 String                   @id @default(dbgenerated()) @db.Uuid
+  id                                 String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   customerableId                     String?                  @db.Uuid @map("customerable_id")
   customerableType                   CustomerableType         @map("customerable_type")
   tags                               Json?
@@ -125,7 +125,7 @@ enum BusinessStatus {
 
 model Business {
   @@map(name: "businesses_businesses")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name                                String
   abn                                 String                  @unique
   logoUri                             String?                 @map("logo_uri")
@@ -173,7 +173,7 @@ enum ProductStatus {
 
 model Product {
   @@map(name: "products_products")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name                                String
   description                         String
   externalReference                   String?                 @map("external_reference")
@@ -208,7 +208,7 @@ enum VariantStatus {
 
 model Variant {
   @@map(name: "products_variant")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   status                              VariantStatus           @default(ACTIVE)
   description                         String
   sellEx                              Decimal                 @db.Decimal(12,2)  @map("sell_ex")
@@ -248,7 +248,7 @@ enum RuleType {
 
 model AvailabilityRule {
   @@map(name: "products_availability_rule")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   status                              AvailabilityRulesStatus @default(ACTIVE)
   type                                RuleType
   regionIds                           String[]                @map("region_ids")
@@ -272,7 +272,7 @@ enum DiscountStatus {
 
 model Discount {
   @@map(name: "products_discount")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name                                String
   status                              DiscountStatus          @default(ACTIVE)
   startAt                             DateTime?               @map("start_at")         @db.Timestamptz()
@@ -293,7 +293,7 @@ enum DiscountValueType {
 
 model DiscountValue {
   @@map(name: "products_discount_value")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   type                                DiscountValueType
   gtQty                               Decimal                 @db.Decimal(15,5)          @default(0)
   ltQty                               Decimal                 @db.Decimal(15,5)          @default(10000000000000000)
@@ -317,7 +317,7 @@ enum BrandStatus {
 
 model Brand {
   @@map(name: "products_brands")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   status                              BrandStatus             @default(ACTIVE)
   name                                String
   logoId                              String                  @db.Uuid @map("logo_id")
@@ -339,7 +339,7 @@ enum ProductUnitStatus {
 
 model ProductUnit {
   @@map(name: "products_units")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   singular                            String
   abbreviation                        String
   status                              ProductUnitStatus       @default(ACTIVE)
@@ -359,7 +359,7 @@ enum CollectionStatus {
 
 model Collection {
   @@map(name: "products_collections")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name                                String
   description                         String
   status                              CollectionStatus        @default(ACTIVE)
@@ -387,7 +387,7 @@ enum MediaType {
 
 model Media {
   @@map(name: "products_media")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   status                              MediaStatus             @default(ACTIVE)
   label                               String
   type                                MediaType       
@@ -408,7 +408,7 @@ model Media {
 
 model OrderItem {
   @@map(name: "orders_order_items")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   qtyOrdered                          Int                     @map("qty_ordered")
   qtyReceived                         Int?                    @map("qty_received")
   sellEx                              Decimal                 @db.Decimal(12,2) @map("sell_ex")
@@ -429,7 +429,7 @@ model OrderItem {
 
 model Order {
   @@map(name: "orders_orders")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   orderRef                            Int                     @default(autoincrement()) @map("order_ref")
   completedAt                         DateTime?               @map("completed_at") @db.Timestamptz()
   shippedAt                           DateTime?               @map("shipped_at") @db.Timestamptz()
@@ -454,7 +454,7 @@ model Order {
 
 model Cart {
   @@map(name: "orders_carts")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   data                                Json
 
   fdCustomerId                        String                  @db.Uuid @map("fd_customer_id")
@@ -466,7 +466,7 @@ model Cart {
 
 model Invoice {
   @@map(name: "orders_invoices")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   invoiceRef                          Int                     @default(autoincrement()) @map("invoice_ref")
   generatedFileUrl                    String                  @map("generated_file_url")
 
@@ -497,7 +497,7 @@ enum PaymentMethodType {
 
 model PaymentMethod {
   @@map(name: "payments_payment_methods")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   type                                PaymentMethodType
   status                              PaymentMethodStatus     @default(ACTIVE)
   data                                Json?
@@ -518,7 +518,7 @@ enum TransactionType {
 
 model Payment {
   @@map(name: "payments_payments")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   receiptNumber                       Int?                    @default(autoincrement()) @map("receipt_number")
   notes                               String?
   amount                              Decimal?                @db.Decimal(12,2)
@@ -543,7 +543,7 @@ model Payment {
 
 model Place {
   @@map(name: "places_places")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   countryCode                         String
   stateCode                           String
   suburb                              String  
@@ -563,7 +563,7 @@ model Place {
 
 model Region {
   @@map(name: "places_regions")
-  id                                  String                  @id @default(dbgenerated()) @db.Uuid
+  id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name                                String
   polygon                             Unsupported("polygon")?
   businessId                          String?                 @db.Uuid @map("business_id")
@@ -580,7 +580,7 @@ model Region {
 // model users_events {
   // @@map(name: "users_events")
   /// The value of this field is generated by the database as: `uuid_generate_v1()`.
-  // id        String   @id @default(dbgenerated()) @db.Uuid
+  // id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   // event      String
   // data       Json?
   // user_uuid  String?
