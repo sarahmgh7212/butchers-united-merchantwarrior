@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
+import { flattenValidationErrors } from './libs/helpers/flatten-validation-errors';
 
 function useValidation(app: INestApplication) {
   app.useGlobalPipes(
@@ -16,14 +17,11 @@ function useValidation(app: INestApplication) {
       whitelist: true,
       forbidNonWhitelisted: true,
       exceptionFactory: (validationErrors: ValidationError[]) => {
-        // const errors = this.flattenValidationErrors(validationErrors);
-        // const formattedErrors = errors.map(e => {
+        const errs = flattenValidationErrors(validationErrors)
+          .filter((e) => e.constraints)
+          .map(({ property, constraints }) => ({ property, constraints }));
 
-        //   return {
-
-        //   }
-        // });
-        return new UnprocessableEntityException(validationErrors);
+        return new UnprocessableEntityException(errs);
       },
     }),
   );
@@ -40,6 +38,8 @@ function useDocs(app: INestApplication, urlRoot?: string) {
     const options = new DocumentBuilder()
       .setTitle('VSC')
       .setDescription('API for VSC')
+      .addServer('http://localhost:3000/dev', 'Serverless Dev')
+      .addServer('http://localhost:3000', 'Nest Server Dev')
       .setVersion('1.0')
       .addBearerAuth()
       .build();
