@@ -30,11 +30,13 @@ function useValidation(app: INestApplication) {
 }
 
 function useLogger(app: INestApplicationContext) {
-  app.useLogger(app.get(Logger));
+  // app.useLogger(app.get(Logger));
 }
 
-function useDocs(app: INestApplication) {
+function useDocs(app: INestApplication, urlRoot?: string) {
   if (['development', 'staging'].includes(process.env.NODE_ENV)) {
+    // const uri = urlRoot ? `${urlRoot}/api` : 'api';
+
     const options = new DocumentBuilder()
       .setTitle('VSC')
       .setDescription('API for VSC')
@@ -42,14 +44,14 @@ function useDocs(app: INestApplication) {
       .addBearerAuth()
       .build();
     const document = SwaggerModule.createDocument(app, options);
-    SwaggerModule.setup('api', app, document);
+    SwaggerModule.setup('docs', app, document);
   }
 }
 
-function configureApp(app: INestApplication) {
+function configureApp(app: INestApplication, urlRoot?: string) {
   useValidation(app);
   useLogger(app);
-  useDocs(app);
+  useDocs(app, urlRoot);
 }
 
 function configureAppContext(app: INestApplicationContext) {

@@ -16,10 +16,10 @@ export abstract class Policy<T> {
     return this._options;
   }
 
-  list?: (user: AuthedUser) => boolean;
-  view?: (user: AuthedUser, model: T) => boolean;
-  create?: (user: AuthedUser) => boolean;
-  update?: (user: AuthedUser, model: T) => boolean;
-  delete?: (user: AuthedUser, model: T) => boolean;
-  destroy?: (user: AuthedUser, model: T) => boolean;
+  list?(user: AuthedUser): boolean;
+  view?(user: AuthedUser | undefined, model: T): boolean;
+  create?(user: AuthedUser): boolean;
+  update?(user: AuthedUser | undefined, model: T): boolean;
+  delete?(user: AuthedUser | undefined, model: T): boolean;
+  destroy?(user: AuthedUser | undefined, model: T): boolean;
 }

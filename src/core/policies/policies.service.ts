@@ -1,5 +1,5 @@
 import { DiscoveryService } from '@golevelup/nestjs-discovery';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, Scope } from '@nestjs/common';
 import { PinoLogger } from 'nestjs-pino';
 import { isFunction } from 'src/libs/helpers/is-function';
 import { AuthService } from '../auth/auth.service';
@@ -11,16 +11,20 @@ import { Policy } from './policy';
 
 @Injectable()
 export class PoliciesService implements OnModuleInit {
-  private readonly policyMap: PolicyMap;
+  private readonly _policyMap: PolicyMap;
 
   constructor(
     private readonly discover: DiscoveryService,
-    private readonly authService: AuthService,
     private readonly prisma: PrismaService,
     private readonly logger: PinoLogger,
+    private readonly authService: AuthService,
   ) {
-    this.policyMap = {};
+    this._policyMap = {};
     this.logger.setContext(PoliciesService.name);
+  }
+
+  get policyMap() {
+    return this._policyMap;
   }
 
   async onModuleInit() {
@@ -38,7 +42,7 @@ export class PoliciesService implements OnModuleInit {
     );
 
     this.logger.debug('Auto policy registration complete', {
-      policyMap: this.policyMap,
+      _policyMap: this._policyMap,
     });
   }
 
@@ -47,6 +51,7 @@ export class PoliciesService implements OnModuleInit {
 
     const modelMiddleware: ModelMiddleware = {};
     const authService = this.authService;
+
     const prisma = this.prisma;
 
     if (isFunction(policy.list)) {
@@ -207,15 +212,14 @@ export class PoliciesService implements OnModuleInit {
     }
 
     this.prisma.registerModelMiddleware(model, modelMiddleware);
-    this.policyMap[model] = policy;
+    this._policyMap[model] = policy;
   }
 
   canUser<T>(action: PolicyActions, modelName: string, model?: T) {
     if (['view', 'update', 'delete', 'destroy'].includes(action) && !model) {
       throw new Error(`Must pass a model instance for action '${action}'`);
     }
-
-    return this.policyMap[modelName][action](
+    return this._policyMap[modelName][action](
       this.authService.authedUser,
       model,
     );

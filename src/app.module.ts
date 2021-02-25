@@ -6,8 +6,9 @@ import { SentryModule } from '@ntegral/nestjs-sentry';
 import { LogLevel } from '@sentry/types';
 import * as admin from 'firebase-admin';
 import { readFileSync } from 'fs';
+import { LoggerModule } from 'nestjs-pino';
+import { RequestContextModule } from 'nestjs-request-context';
 import { SlackModule } from 'nestjs-slack-webhook';
-import { TwilioModule } from 'nestjs-twilio';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -38,7 +39,7 @@ import { VariantsModelModule } from './models/variants/variants.model.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    ProductsModelModule,
+    RequestContextModule,
     AuthModule,
     PrismaModule,
     FirebaseAdminModule.forRootAsync({
@@ -77,17 +78,25 @@ import { VariantsModelModule } from './models/variants/variants.model.module';
       }),
       inject: [ConfigService],
     }),
-    TwilioModule.forRootAsync({
-      useFactory: async (cfg: ConfigService) => ({
-        accountSid: cfg.get('TWILIO_ACCOUNT_SID'),
-        authToken: cfg.get('TWILIO_AUTH_TOKEN'),
-      }),
+    // TwilioModule.forRootAsync({
+    //   useFactory: async (cfg: ConfigService) => ({
+    //     accountSid: cfg.get('TWILIO_ACCOUNT_SID'),
+    //     authToken: cfg.get('TWILIO_AUTH_TOKEN'),
+    //   }),
+    //   inject: [ConfigService],
+    // }),
+    LoggerModule.forRootAsync({
+      useFactory: async (config: ConfigService) => {
+        return {
+          pinoHttp: { level: config.get('LOG_LEVEL') || 'debug' },
+        };
+      },
       inject: [ConfigService],
     }),
     MerchantWarriorModule,
-    ProductsModelModule,
     AuthModule,
     PrismaModule,
+    ProductsModelModule,
     PaymentsModelModule,
     PaymentMethodModelModule,
     UsersModelModule,
@@ -104,8 +113,8 @@ import { VariantsModelModule } from './models/variants/variants.model.module';
     OrdersModelModule,
     OrderItemsModelModule,
     CartsModelModule,
-    JobsModule,
     PoliciesModule,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

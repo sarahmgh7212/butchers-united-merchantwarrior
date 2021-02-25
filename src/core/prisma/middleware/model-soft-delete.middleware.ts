@@ -8,7 +8,7 @@ export class ModelSoftDeleteMiddleware implements ModelMiddleware {
     this._pDelegate = prismaDelegate;
   }
 
-  public async findMany(
+  async findMany(
     params: Prisma.MiddlewareParams,
     next: PrismaNextMiddleware,
   ): Promise<void> {

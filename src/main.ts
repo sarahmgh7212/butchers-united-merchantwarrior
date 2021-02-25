@@ -5,7 +5,7 @@ import { configureApp } from './configure-app';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  configureApp(app);
+  configureApp(app, 'hdfjsdbhjfdbsj');
 
   await app.listen(3000);
 }

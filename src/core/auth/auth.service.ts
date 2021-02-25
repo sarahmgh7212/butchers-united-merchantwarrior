@@ -1,12 +1,15 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
+import { RequestContext } from 'nestjs-request-context';
 import type { AuthedRequest } from './auth.types';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class AuthService {
-  constructor(@Inject(REQUEST) private request: AuthedRequest) {}
-
   get authedUser() {
     return this.request.authedUser;
+  }
+
+  get request() {
+    return RequestContext.currentContext.req as AuthedRequest;
   }
 }

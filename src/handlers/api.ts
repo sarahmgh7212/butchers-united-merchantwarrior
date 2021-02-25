@@ -29,7 +29,7 @@ async function bootstrapServer(): Promise<Server> {
       new ExpressAdapter(expressApp),
     );
     nestApp.use(eventContext());
-    configureApp(nestApp);
+    configureApp(nestApp, 'dev');
     nestApp.enableCors();
     await nestApp.init();
     cachedServer = createServer(expressApp, undefined, binaryMimeTypes);
@@ -39,6 +39,14 @@ async function bootstrapServer(): Promise<Server> {
 }
 
 export const handler: Handler = async (event: any, context: Context) => {
+  if (event.path === '/docs') {
+    event.path = '/docs/';
+  }
+
+  event.path = event.path.includes('swagger-ui')
+    ? `/docs${event.path}`
+    : event.path;
+
   const server = await bootstrapServer();
   return proxy(server, event, context, 'PROMISE').promise;
 };

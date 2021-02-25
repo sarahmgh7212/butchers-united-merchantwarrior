@@ -1,6 +1,10 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { getAllFunctions } from 'src/libs/helpers/get-all-functions';
+import { isClass } from 'src/libs/helpers/is-class';
+import { AVAIABLE_MIDDLEWARE_ACTIONS } from './prisma.constants';
 import { ModelMiddleware, ModelMiddlewareMap } from './prisma.types';
+import * as camelCase from 'camelcase';
 
 @Injectable()
 export class PrismaService
@@ -13,7 +17,7 @@ export class PrismaService
 
     this.$use(async (params, next) => {
       const { action } = params;
-      const model = params.model.toLowerCase();
+      const model = camelCase(params.model);
 
       if (
         !Object.prototype.hasOwnProperty.call(this.modelMiddlewares, model) ||
@@ -27,7 +31,8 @@ export class PrismaService
       let nextFn = next;
 
       for (let i = mws.length - 1; i >= 0; i--) {
-        nextFn = (p) => mws[i](p, nextFn);
+        const nextRef = nextFn;
+        nextFn = (p) => mws[i](p, nextRef);
       }
 
       return nextFn(params);
@@ -39,29 +44,34 @@ export class PrismaService
   }
 
   registerModelMiddleware(modelName: string, middleware: ModelMiddleware) {
-    const actions = Object.getOwnPropertyNames(
-      Object.getPrototypeOf(middleware),
-    ).filter((a) => a !== 'constructor');
+    const actions = getAllFunctions(middleware).filter((a) =>
+      AVAIABLE_MIDDLEWARE_ACTIONS.includes(a),
+    );
+
+    const parsedModelName = camelCase(modelName);
 
     for (let i = 0; i < actions.length; i++) {
       const fn = actions[i];
       const mwFn = middleware[fn];
 
       if (
-        !Object.prototype.hasOwnProperty.call(this.modelMiddlewares, modelName)
+        !Object.prototype.hasOwnProperty.call(
+          this.modelMiddlewares,
+          parsedModelName,
+        )
       ) {
-        this.modelMiddlewares[modelName] = {};
+        this.modelMiddlewares[parsedModelName] = {};
       }
 
       if (
         !Object.prototype.hasOwnProperty.call(
-          this.modelMiddlewares[modelName],
+          this.modelMiddlewares[parsedModelName],
           fn,
         )
       ) {
-        this.modelMiddlewares[modelName][fn] = [mwFn.bind(middleware)];
+        this.modelMiddlewares[parsedModelName][fn] = [mwFn.bind(middleware)];
       } else {
-        this.modelMiddlewares[modelName][fn].push(mwFn.bind(middleware));
+        this.modelMiddlewares[parsedModelName][fn].push(mwFn.bind(middleware));
       }
     }
   }

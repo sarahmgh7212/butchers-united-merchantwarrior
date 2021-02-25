@@ -1,11 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, ProductUnit } from '@prisma/client';
+import { PoliciesService } from 'src/core/policies/policies.service';
+import { ModelSoftDeleteMiddleware } from 'src/core/prisma/middleware/model-soft-delete.middleware';
 import { PrismaService } from 'src/core/prisma/prisma.service';
 import { ModelService } from 'src/libs/resources/types';
 
 @Injectable()
 export class ProductUnitModelService implements ModelService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private policies: PoliciesService,
+  ) {
+    this.prisma.registerModelMiddleware(
+      'productUnit',
+      new ModelSoftDeleteMiddleware(this.prisma),
+    );
+  }
 
   async findMany(
     args?: Prisma.ProductUnitFindManyArgs,
