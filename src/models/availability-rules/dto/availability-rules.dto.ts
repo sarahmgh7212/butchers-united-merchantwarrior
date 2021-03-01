@@ -1,6 +1,7 @@
 import {
   AvailabilityRule,
   AvailabilityRulesStatus,
+  CustomerableType,
   RuleType,
 } from '@prisma/client';
 import { Expose } from 'class-transformer';
@@ -23,7 +24,7 @@ export class AvailabilityRulesDto implements AvailabilityRule {
   variantId: string;
 
   @Expose({ groups: [] })
-  customerType: string | null;
+  customerType: CustomerableType | null;
 
   @Expose({ groups: [] })
   customerIds: string[];

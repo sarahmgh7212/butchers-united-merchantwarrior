@@ -7,6 +7,6 @@ import { Policy } from 'src/core/policies/policy';
 @Injectable()
 export class ProductUnitsPolicy extends Policy<ProductUnit> {
   list(user: User) {
-    return false;
+    return true;
   }
 }

@@ -1,5 +1,5 @@
-org: villageco
-app: vsc
+# org: villageco
+# app: vsc
 
 service: core-api
 useDotenv: true
@@ -73,8 +73,8 @@ package:
 custom:
   eventBus: ${self:provider.stage}-events
   domain:
-    staging: api.s.hellocourses.com.au
-    production: api.hellocourses.com.au
+    staging: api.s.vsc.ai
+    production: api.vsc.ai
   customDomain:
     basePath: ''
     domainName: ${self:custom.domain.${self:provider.stage}}
@@ -95,5 +95,5 @@ plugins:
   - serverless-webpack
   - serverless-offline
   - serverless-offline-aws-eventbridge
-  - serverless-domain-manager
+  # - serverless-domain-manager
   - serverless-pseudo-parameters

@@ -4,6 +4,9 @@
 /.webpack
 /.serverless
 
+# Environment
+.env
+
 # Logs
 logs
 *.log
