@@ -40,7 +40,7 @@ export class JobsService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    this.logger.debug('Starting job handler search');
+    this.logger.info('Starting job handler search');
 
     const methods = await this.discover.providerMethodsWithMetaAtKey<string>(
       JOB_NAME,
@@ -48,7 +48,7 @@ export class JobsService implements OnModuleInit {
 
     methods.forEach(this.registerHandler);
 
-    this.logger.debug('Auto handler registration complete', {
+    this.logger.info('Auto handler registration complete', {
       policyMap: this.handlerMap,
     });
   }
@@ -88,7 +88,7 @@ export class JobsService implements OnModuleInit {
     };
 
     const prom = this.eventBridge.putEvents(params).promise();
-    this.logger.debug('Job triggered', { eventBridgeParams: params });
+    this.logger.info('Job triggered', { eventBridgeParams: params });
 
     return prom;
   }
@@ -106,9 +106,11 @@ export class JobsService implements OnModuleInit {
     const handler = this.handlerMap[job];
     const service = await instance.resolve(handler.providerClass, contextId);
 
-    this.logger.debug('Job processing', { job, data, contextId });
+    this.logger.info('Job processing', { job, contextId });
+    this.logger.debug('Job processing data', { job, data, contextId });
     const result = await service[handler.methodName](data);
-    this.logger.debug('Job completed', { job, result, contextId });
+    this.logger.info('Job completed', { job, contextId });
+    this.logger.debug('Job completed data', { job, result, contextId });
 
     return result;
   }

@@ -207,7 +207,7 @@ enum VariantStatus {
 }
 
 model Variant {
-  @@map(name: "products_variant")
+  @@map(name: "products_variants")
   id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   status                              VariantStatus           @default(ACTIVE)
   description                         String
@@ -247,14 +247,14 @@ enum RuleType {
 }
 
 model AvailabilityRule {
-  @@map(name: "products_availability_rule")
+  @@map(name: "products_availability_rules")
   id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   status                              AvailabilityRulesStatus @default(ACTIVE)
   type                                RuleType
   regionIds                           String[]                @map("region_ids")
-  customerType                        String?                 @map("customer_type")
+  customerType                        CustomerableType?           @map("customer_type")
   customerIds                         String[]                @map("customer_ids")
-  tags                                String[]
+  tags                                Json?
 
   variantId                           String                  @db.Uuid @map("variant_id")
   
@@ -271,7 +271,7 @@ enum DiscountStatus {
 }
 
 model Discount {
-  @@map(name: "products_discount")
+  @@map(name: "products_discounts")
   id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name                                String
   status                              DiscountStatus          @default(ACTIVE)
@@ -292,7 +292,7 @@ enum DiscountValueType {
 }
 
 model DiscountValue {
-  @@map(name: "products_discount_value")
+  @@map(name: "products_discount_values")
   id                                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   type                                DiscountValueType
   gtQty                               Decimal                 @db.Decimal(15,5)          @default(0)

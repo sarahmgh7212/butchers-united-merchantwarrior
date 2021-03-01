@@ -181,7 +181,7 @@ CREATE TABLE "products_products" (
 );
 
 -- CreateTable
-CREATE TABLE "products_variant" (
+CREATE TABLE "products_variants" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "status" "VariantStatus" NOT NULL DEFAULT E'ACTIVE',
     "description" TEXT NOT NULL,
@@ -205,14 +205,14 @@ CREATE TABLE "products_variant" (
 );
 
 -- CreateTable
-CREATE TABLE "products_availability_rule" (
+CREATE TABLE "products_availability_rules" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "status" "AvailabilityRulesStatus" NOT NULL DEFAULT E'ACTIVE',
     "type" "RuleType" NOT NULL,
     "region_ids" TEXT[],
-    "customer_type" TEXT,
+    "customer_type" "CustomerableType",
     "customer_ids" TEXT[],
-    "tags" TEXT[],
+    "tags" JSONB,
     "variant_id" UUID NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "udpated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -222,7 +222,7 @@ CREATE TABLE "products_availability_rule" (
 );
 
 -- CreateTable
-CREATE TABLE "products_discount" (
+CREATE TABLE "products_discounts" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "name" TEXT NOT NULL,
     "status" "DiscountStatus" NOT NULL DEFAULT E'ACTIVE',
@@ -236,7 +236,7 @@ CREATE TABLE "products_discount" (
 );
 
 -- CreateTable
-CREATE TABLE "products_discount_value" (
+CREATE TABLE "products_discount_values" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "type" "DiscountValueType" NOT NULL,
     "gtQty" DECIMAL(15,5) NOT NULL DEFAULT 0,
@@ -536,16 +536,16 @@ ALTER TABLE "products_products" ADD FOREIGN KEY ("productUnitId") REFERENCES "pr
 ALTER TABLE "products_products" ADD FOREIGN KEY ("mediaId") REFERENCES "products_media"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "products_variant" ADD FOREIGN KEY ("product_id") REFERENCES "products_products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "products_variants" ADD FOREIGN KEY ("product_id") REFERENCES "products_products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "products_variant" ADD FOREIGN KEY ("discount_id") REFERENCES "products_discount"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "products_variants" ADD FOREIGN KEY ("discount_id") REFERENCES "products_discounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "products_availability_rule" ADD FOREIGN KEY ("variant_id") REFERENCES "products_variant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "products_availability_rules" ADD FOREIGN KEY ("variant_id") REFERENCES "products_variants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "products_discount_value" ADD FOREIGN KEY ("discount_id") REFERENCES "products_discount"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "products_discount_values" ADD FOREIGN KEY ("discount_id") REFERENCES "products_discounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "products_brands" ADD FOREIGN KEY ("supplier_id") REFERENCES "businesses_businesses"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -566,7 +566,7 @@ ALTER TABLE "products_media" ADD FOREIGN KEY ("productId") REFERENCES "products_
 ALTER TABLE "orders_order_items" ADD FOREIGN KEY ("order_id") REFERENCES "orders_orders"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "orders_order_items" ADD FOREIGN KEY ("fd_variant_id") REFERENCES "products_variant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "orders_order_items" ADD FOREIGN KEY ("fd_variant_id") REFERENCES "products_variants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "orders_orders" ADD FOREIGN KEY ("fd_supplier_id") REFERENCES "businesses_businesses"("id") ON DELETE CASCADE ON UPDATE CASCADE;
